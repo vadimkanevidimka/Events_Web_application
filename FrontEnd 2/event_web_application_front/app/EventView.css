@@ -1,0 +1,21 @@
+    .pin-image {
+        width: 100%;
+        height: auto;
+    }
+
+    .pin-details, .comments-section {
+        padding: 1rem;
+        background-color: #fff;
+    }
+
+    .comment {
+        margin-bottom: 1rem;
+    }
+
+        .comment .comment-author {
+            font-weight: bold;
+        }
+
+        .comment .comment-text {
+            margin-top: 0.5rem;
+        }
