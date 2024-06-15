@@ -4,8 +4,9 @@ using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using React.AspNet;
-using Events_Web_application.Models;
+using Events_Web_application.Core.MidleWare;
 using Events_Web_application_DataBase.Repositories;
+using Events_Web_appliacation.Core.MidleWare.EmailNotificationService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandlerMiddleware();
+
+//app.UseEmailServiceMidleware();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

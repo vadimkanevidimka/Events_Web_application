@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Events_Web_appliacation.Core.Models
+namespace Events_Web_application_DataBase
 {
     public class Participant
     {

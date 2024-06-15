@@ -1,40 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Events_Web_appliacation.Core.Models
+namespace Events_Web_application_DataBase
 {
     public class User
     {
-        private User(string email, string password, int role, int participantId, Participant participant)
-        {
-            Email = email;
-            Password = password;
-            Role = role;
-            ParticipantId = participantId;
-            Participant = participant;
-        }
-
-        public int Id { get; }
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(100)]
-        public string Email { get; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(100)]
-        public string Password { get; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
         [Required]
-        public int Role { get; }
+        public int Role { get; set; }
         [Required]
-        public int ParticipantId { get; }
+        public int ParticipantId { get; set; }
         [Required]
-        public Participant Participant { get; }
-
-        public static (User Event, string Error) Create(string email, string password, int role, int participantId, Participant participant)
-        {
-            var error = string.Empty;
-            if (string.IsNullOrEmpty(email)) error = "Email is null";
-            var user = new User(email, password, role, participantId, participant);
-            return (user, error);
-        }
+        public Participant Participant { get; set; }
     }
 }

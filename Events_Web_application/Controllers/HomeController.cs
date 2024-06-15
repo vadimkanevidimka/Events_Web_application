@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-
 namespace Events_Web_application.Controllers
 {
     public class HomeController : Controller

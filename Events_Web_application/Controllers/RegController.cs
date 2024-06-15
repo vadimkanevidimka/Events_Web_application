@@ -2,11 +2,9 @@
 using Events_Web_application_DataBase.Repositories;
 using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Events_Web_application.Controllers
 {
-    //[Route("api/{Reg}")]
     public class RegController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

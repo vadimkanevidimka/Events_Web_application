@@ -1,8 +1,7 @@
 ﻿using Events_Web_application_DataBase;
 using Microsoft.AspNetCore.Mvc;
 using Events_Web_application_DataBase.Repositories;
-using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Events_Web_appliacation.Core.MidleWare.EmailNotificationService;
 
 namespace Events_Web_application.Controllers
 {
@@ -89,10 +88,26 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpPatch]
-        public ActionResult<Event> Update([FromBody] Event @event)
+        public async Task<ActionResult<Event>> Update([FromBody] Event @event)
         {
+            var participantsEmails = @event.Participants.Select(c => c.Email).ToList();
+            var email = new EmailServiceBuilder().SetMailSender("vadimdeg6@gmail.com")
+                .SetMailRecievers(participantsEmails.ToArray())
+                .SetCreditials("vadimdeg6@gmail.com", "_51683Bv435")
+                .SetMailContent("Event had been updated", 
+                $"<div class=\"col-lg-8 shadow rounded\">" +
+                $"<div class=\"pin-details\">" +
+                $"<h1 class=\"pin-title\">{@event.Title}</h1>" +
+                $"<p class=\"pin-description\"><strong>Description: </strong>{@event.Description}</p>" +
+                $"<p><strong>Date:</strong>{{new Date({@event.EventDateTime}).toLocaleString()}}</p>" +
+                $"<p><strong>Location:</strong>{@event.Location}</p><p><strong>Category:</strong> {@event.Category}</p>" +
+                $"<p><strong>Available Seats:</strong> {@event.MaxParticipants - @event.Participants.Count}</p>" +
+                $"</div>" +
+                $"</div>");
+                var sender = email.Build();
             @event.Participants = null;
             _unitOfWork.Events.Update(@event);
+            await sender.SendAsync();
             return Ok(_unitOfWork.Events.Get(@event.Id));
         }
     }
