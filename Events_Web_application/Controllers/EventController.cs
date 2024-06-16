@@ -80,11 +80,27 @@ namespace Events_Web_application.Controllers
             return _unitOfWork.Events.Update(evnt);
         }
         [HttpGet]
-        public List<Event> GetUsersEvents(int userid)
+        public List<Event> GetUsersEvents(int userid, string search = "", string category = "", string location = "")
         {
             var user = _unitOfWork.Users.Get(userid);
-            var userevents = _unitOfWork.Events.GetAll().Where(c => c.Participants.Contains(user.Participant)).ToList();
-            return userevents;
+            var query = _unitOfWork.Events.GetAll().Where(c => c.Participants.Contains(user.Participant));
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(e => e.Title.Contains(search));
+            }
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                query = query.Where(e => e.Category.Contains(category));
+            }
+
+            if (!string.IsNullOrEmpty(location))
+            {
+                query = query.Where(e => e.Location.Contains(location));
+            }
+
+            return query.ToList();
         }
 
         [HttpPatch]

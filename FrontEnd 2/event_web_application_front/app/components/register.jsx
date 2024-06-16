@@ -2,9 +2,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Form, Button, Container } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
@@ -30,6 +31,7 @@ const Register = () => {
     try {
       const response = await axios.post('http://localhost:5155/api/Reg/Registration', user);
       if(response.status == 200) alert('Registration successful!');
+      navigate(-1);
     } catch (response) {
       alert(`Registration failed! ${response.response.data.ErrorMessage}`);
     }

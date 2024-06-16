@@ -9,25 +9,36 @@ import '../CardStyle.css'
 const UserEvents = () => {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState('');
+  const userId = localStorage.getItem("UserId");
+  const [category, setCategory] = useState('');
+  const [location, setLocation] = useState('');
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const userId = localStorage.getItem("UserId");
-      const response = await axios.get(`http://localhost:5155/api/Event/GetUsersEvents?userid=${userId}`); // Implement this endpoint
+      const response = await axios.get(`http://localhost:5155/api/Event/GetUsersEvents?userid=${userId}`
+      , { 
+        params: {
+          search,
+          category,
+          location,
+        },
+      }
+      );
       setEvents(response.data);
     };
 
     fetchEvents();
-  }, []);
+  }, [userId,search, category, location]);
 
   return (
       <Container claccName="my-4">
       <h1>My events</h1>
       <div>
-          <div class="container pb-4">
+      <div class="container pb-4">
           <form class="d-flex pt-4">
-              <input class="form-control me-2 rounded-pill shadow" type="search" name="SearchText" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)}></input>
-              <button class="btn btn-outline-success rounded-pill shadow" type="submit">Search</button>
+            <input className='form-control rounded-pill shadow m-2' type="text" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input className='form-control rounded-pill shadow m-2' type="text" placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
+            <input className='form-control rounded-pill shadow m-2' type="text" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
           </form>
           </div>
           <div class="container my-4">
