@@ -14,7 +14,17 @@ namespace Event_Web_application.Tests
         static string TestConnection = "Data Source = TestEWADB.db";
         static DbContextOptionsBuilder optionsBuilder;
         static EWADBContext _context;
-        UsersController controller;
+        IUnitOfWork _unitOfWork;
+        UsersController _controller;
+        
+        public UnitTestUserController() 
+        {
+            optionsBuilder = new DbContextOptionsBuilder<EWADBContext>();
+            DbContextOptions options = optionsBuilder.UseSqlite(TestConnection).Options;
+            _context = new EWADBContext((DbContextOptions<EWADBContext>)options);
+            _unitOfWork = new UnitOfWork(_context);
+            _controller = new UsersController(_unitOfWork);
+        }
 
 
         private readonly HttpClient _httpClient;
@@ -22,14 +32,31 @@ namespace Event_Web_application.Tests
         [Fact]
         public async void GetAllUsers_ShouldReturnAllProducts()
         {
-            optionsBuilder = new DbContextOptionsBuilder<EWADBContext>();
-            DbContextOptions options = optionsBuilder.UseSqlite(TestConnection).Options;
-            _context = new EWADBContext((DbContextOptions<EWADBContext>)options);
-            UsersController controller = new UsersController(new UnitOfWork(_context));
-            var testusers = _context.Users.ToList();
-            var resultusers = controller.GetAll();
+            var testuser = _controller.GetAll();
+            var resultusers = _context.Users.ToList();
+            Assert.Equal(resultusers, testuser);
+        }
 
-            Assert.Equal(testusers, resultusers);
+        [Fact]  
+        public async void AddNewUser_ShouldReturnTheNumberOfUser()
+        {
+            var newuser = new User
+            {
+                Email = "Email",
+                Password = "password",
+                Role = 2,
+                Participant = new Participant
+                {
+                    DateOfBirth = DateTime.Now,
+                    Email = "Email",
+                    FirstName = "Name",
+                    LastName = "LastName",
+                    RegistrationDate = DateTime.Now,
+                },
+            };
+            var testuserid = _controller.AddUser(newuser.Email, newuser.Password).Id;
+            var resultusers = _controller.Get(testuserid);
+            Assert.Equal(resultusers.Email, newuser.Email);
         }
     }
 }
