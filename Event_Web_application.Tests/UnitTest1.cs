@@ -1,11 +1,8 @@
+using Events_Web_application.Application.Services.UnitOfWork;
 using Events_Web_application.Controllers;
-using Events_Web_application_DataBase;
-using Events_Web_application_DataBase.Repositories;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
+using Events_Web_application.Domain.Models;
+using Events_Web_application.Infrastructure.DBContext;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-using System.Net;
 
 namespace Event_Web_application.Tests
 {
@@ -26,13 +23,10 @@ namespace Event_Web_application.Tests
             _controller = new UsersController(_unitOfWork);
         }
 
-
-        private readonly HttpClient _httpClient;
-
         [Fact]
         public async void GetAllUsers_ShouldReturnAllProducts()
         {
-            var testuser = _controller.GetAll();
+            var testuser = await _controller.GetAll();
             var resultusers = _context.Users.ToList();
             Assert.Equal(resultusers, testuser);
         }
@@ -48,14 +42,13 @@ namespace Event_Web_application.Tests
                 Participant = new Participant
                 {
                     DateOfBirth = DateTime.Now,
-                    Email = "Email",
                     FirstName = "Name",
                     LastName = "LastName",
                     RegistrationDate = DateTime.Now,
                 },
             };
-            var testuserid = _controller.AddUser(newuser.Email, newuser.Password).Id;
-            var resultusers = _controller.Get(testuserid);
+            var testuserid = await _controller.AddUser(newuser.Email, newuser.Password);
+            var resultusers = await _controller.Get(testuserid);
             Assert.Equal(resultusers.Email, newuser.Email);
         }
     }

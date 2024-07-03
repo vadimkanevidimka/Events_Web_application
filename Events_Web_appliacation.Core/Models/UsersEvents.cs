@@ -1,9 +1,11 @@
-﻿namespace Events_Web_application_DataBase
+﻿namespace Events_Web_application.Domain.Models
 {
     public class UsersEvents
     {
-        public int ParticipantId { get; set; }
-        public int EventId { get; set; }
+        public Guid Id { get; set; }
+        public Guid ParticipantId { get; set; }
+        public Guid EventId { get; set; }
+        public bool ParticipantStatus { get; set; }
         public DateTime CheckInTime { get; set; }
     }
 }

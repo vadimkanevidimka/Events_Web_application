@@ -3,16 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events_Web_application", "Events_Web_application.csproj", "{A0DF5870-1E3C-487E-8DD2-2FB0E598E886}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events_Web_application.API", "Events_Web_application.API.csproj", "{A0DF5870-1E3C-487E-8DD2-2FB0E598E886}"
 	ProjectSection(ProjectDependencies) = postProject
 		{EA1CFD52-EEF1-45FF-9AED-AE58FB36AF01} = {EA1CFD52-EEF1-45FF-9AED-AE58FB36AF01}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events_Web_application_DataBase", "..\Events_Web_application_DataBase\Events_Web_application_DataBase.csproj", "{EA1CFD52-EEF1-45FF-9AED-AE58FB36AF01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events_Web_application.Infrastructure", "..\Events_Web_application_DataBase\Events_Web_application.Infrastructure.csproj", "{EA1CFD52-EEF1-45FF-9AED-AE58FB36AF01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events_Web_appliacation.Core", "..\Events_Web_appliacation.Core\Events_Web_appliacation.Core.csproj", "{8B0F56E8-C3E9-48DD-B581-CABFE5A48656}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events_Web_application.Domain", "..\Events_Web_appliacation.Core\Events_Web_application.Domain.csproj", "{8B0F56E8-C3E9-48DD-B581-CABFE5A48656}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Event_Web_application.Tests", "..\Event_Web_application.Tests\Event_Web_application.Tests.csproj", "{C3F1B42B-51FF-4D5C-87B6-95E8DD912EF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Event_Web_application.Tests", "..\Event_Web_application.Tests\Event_Web_application.Tests.csproj", "{C3F1B42B-51FF-4D5C-87B6-95E8DD912EF3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events_Web_application.Application", "..\Events_Web_appliacation.Application\Events_Web_application.Application.csproj", "{6546562D-2B26-48C0-BBF1-778079F39FCD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EA1CFD52-EEF1-45FF-9AED-AE58FB36AF01} = {EA1CFD52-EEF1-45FF-9AED-AE58FB36AF01}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +41,10 @@ Global
 		{C3F1B42B-51FF-4D5C-87B6-95E8DD912EF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3F1B42B-51FF-4D5C-87B6-95E8DD912EF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3F1B42B-51FF-4D5C-87B6-95E8DD912EF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6546562D-2B26-48C0-BBF1-778079F39FCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6546562D-2B26-48C0-BBF1-778079F39FCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6546562D-2B26-48C0-BBF1-778079F39FCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6546562D-2B26-48C0-BBF1-778079F39FCD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

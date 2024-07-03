@@ -1,5 +1,5 @@
-﻿using Events_Web_application_DataBase;
-using Events_Web_application_DataBase.Repositories;
+﻿using Events_Web_application.Application.Services.UnitOfWork;
+using Events_Web_application.Domain.Models;
 using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,39 +14,39 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpGet("{id}")]
-        public User Get(int id) => _unitOfWork.Users.Get(id);
+        public Task<User> Get(Guid id) => _unitOfWork.UsersService.GetUsersById(id);
 
         [HttpGet]
-        public List<User> GetAll() => _unitOfWork.Users.GetAll().ToList();
+        public async Task<IEnumerable<User>> GetAll() => await _unitOfWork.UsersService.GetAllUsers();
 
         [HttpPost]
-        public User AddUser(string email, string password)
+        public async Task<Guid> AddUser(string email, string password)
         {
             try
             {
-                _unitOfWork.Users.Add(new User 
+                await _unitOfWork.UsersService.AddUser(new User 
                 {
                     Email = email,
                     Password = password.CalculateHash(),
                 });
-                return _unitOfWork.Users.Get(1);
+                return _unitOfWork.UsersService.GetAllUsers().Result.Last().Id;
             }
             catch
             {
-                return _unitOfWork.Users.Get(1);
+                return default;
             }
         }
 
         [HttpDelete]
-        public int Delete(int id) 
+        public async Task<int> Delete(Guid id) 
         {
-            return _unitOfWork.Users.Delete(id);
+            return await _unitOfWork.UsersService.DeleteUser(id);
         }
 
         [HttpPatch]
-        public int Update(User user)
+        public async Task<int> Update(User user)
         {
-            return _unitOfWork.Users.Update(user);
+            return await _unitOfWork.UsersService.UpdateUser(user);
         }
     }
 }

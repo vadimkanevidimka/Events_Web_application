@@ -1,12 +1,10 @@
-﻿using Events_Web_application_DataBase;
-using Microsoft.AspNetCore.Mvc;
-using Events_Web_application_DataBase.Repositories;
-using Events_Web_appliacation.Core.MidleWare.EmailNotificationService;
+﻿using Microsoft.AspNetCore.Mvc;
+using Events_Web_application.Domain.Models;
+using Events_Web_application.Application.Services.UnitOfWork;
+using Microsoft.Extensions.Logging;
 
 namespace Events_Web_application.Controllers
 {
-    //[Route("api/[controller]")]
-    //[ApiController]
     public class EventController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -16,115 +14,72 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpPost]
-        public int Add([FromBody] Event @event)
+        public async Task<int> Add([FromBody] Event @event)
         {
-            return _unitOfWork.Events.Add(@event);
+            return await _unitOfWork.EventsService.AddEvent(@event);
         }
 
         [HttpGet]
-        public List<Event> GetAll()
+        public async Task<IEnumerable<Event>> GetAll()
         {
-            return _unitOfWork.Events.GetAll().ToList();
+            return await _unitOfWork.EventsService.GetAllEvents();
         }
 
         [HttpGet]
-        public Event GetById(int id)
+        public async Task<Event> GetById(Guid id)
         {
-            return _unitOfWork.Events.Get(id);
+            return await _unitOfWork.EventsService.GetEventById(id);
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetBySearch(string search = "", string category = "", string location = "")
-        {
-            var query = _unitOfWork.Events.GetAll();
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(e => e.Title.Contains(search));
-            }
-
-            if (!string.IsNullOrEmpty(category))
-            {
-                query = query.Where(e => e.Category.Contains(category));
-            }
-
-            if (!string.IsNullOrEmpty(location))
-            {
-                query = query.Where(e => e.Location.Contains(location));
-            }
-
-            return query.ToList();
-        }
+        public async Task<IEnumerable<Event>> GetBySearch(string search = "", string category = "", string location = "") => 
+            await _unitOfWork.EventsService.GetBySearch(search, category, location);
 
         [HttpPost]
-        public int AddParticipantToEvent(int eventid, int userid)
+        public async Task<int> AddParticipantToEvent(Guid eventid, Guid userid)
         {
-            var participant = _unitOfWork.Participants.Get(userid);
-            var evnt = _unitOfWork.Events.Get(eventid);
-            evnt.Participants.Add(participant);
-            return _unitOfWork.Events.Update(evnt);
+            return await _unitOfWork.EventsService.AddParticipantToEvent(eventid, userid);
         }
 
         [HttpDelete]
-        public int Delete(int id)
+        public async Task<int> Delete(Guid id)
         {
-            return _unitOfWork.Events.Delete(id);
+            return await _unitOfWork.EventsService.Delete(id);
         }
 
         [HttpPost]
-        public int DeleteParticipantFromEvent(int eventid, int userid)
+        public async Task<int> DeleteParticipantFromEvent(Guid eventid, Guid userid)
         {
-            var participant = _unitOfWork.Participants.Get(userid);
-            var evnt = _unitOfWork.Events.Get(eventid);
-            evnt.Participants.Remove(participant);
-            return _unitOfWork.Events.Update(evnt);
+            return await _unitOfWork.EventsService.DeleteParticipantFromEvent(eventid, userid);
         }
         [HttpGet]
-        public List<Event> GetUsersEvents(int userid, string search = "", string category = "", string location = "")
+        public async Task<IEnumerable<Event>> GetUsersEvents(Guid userid, string search = "", string category = "", string location = "")
         {
-            var user = _unitOfWork.Users.Get(userid);
-            var query = _unitOfWork.Events.GetAll().Where(c => c.Participants.Contains(user.Participant));
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(e => e.Title.Contains(search));
-            }
-
-            if (!string.IsNullOrEmpty(category))
-            {
-                query = query.Where(e => e.Category.Contains(category));
-            }
-
-            if (!string.IsNullOrEmpty(location))
-            {
-                query = query.Where(e => e.Location.Contains(location));
-            }
-
-            return query.ToList();
+            return await _unitOfWork.EventsService.GetBySearch(search, category, location);
         }
 
         [HttpPatch]
         public async Task<ActionResult<Event>> Update([FromBody] Event @event)
         {
-            var participantsEmails = @event.Participants.Select(c => c.Email).ToList();
-            var email = new EmailServiceBuilder().SetMailSender("vadimdeg6@gmail.com")
-                .SetMailRecievers(participantsEmails.ToArray())
-                .SetCreditials("vadimdeg6@gmail.com", "_51683Bv435")
-                .SetMailContent("Event had been updated", 
-                $"<div class=\"col-lg-8 shadow rounded\">" +
-                $"<div class=\"pin-details\">" +
-                $"<h1 class=\"pin-title\">{@event.Title}</h1>" +
-                $"<p class=\"pin-description\"><strong>Description: </strong>{@event.Description}</p>" +
-                $"<p><strong>Date:</strong>{{new Date({@event.EventDateTime}).toLocaleString()}}</p>" +
-                $"<p><strong>Location:</strong>{@event.Location}</p><p><strong>Category:</strong> {@event.Category}</p>" +
-                $"<p><strong>Available Seats:</strong> {@event.MaxParticipants - @event.Participants.Count}</p>" +
-                $"</div>" +
-                $"</div>");
-                var sender = email.Build();
-            @event.Participants = null;
-            _unitOfWork.Events.Update(@event);
-            await sender.SendAsync();
-            return Ok(_unitOfWork.Events.Get(@event.Id));
+            //var participantsEmails = @event.Participants.Select(c => c.Email).ToList();
+            //var email = new EmailServiceBuilder().SetMailSender("vadimdeg6@gmail.com")
+            //    .SetMailRecievers(participantsEmails.ToArray())
+            //    .SetCreditials("vadimdeg6@gmail.com", "_51683Bv435")
+            //    .SetMailContent("Event had been updated", 
+            //    $"<div class=\"col-lg-8 shadow rounded\">" +
+            //    $"<div class=\"pin-details\">" +
+            //    $"<h1 class=\"pin-title\">{@event.Title}</h1>" +
+            //    $"<p class=\"pin-description\"><strong>Description: </strong>{@event.Description}</p>" +
+            //    $"<p><strong>Date:</strong>{{new Date({@event.EventDateTime}).toLocaleString()}}</p>" +
+            //    $"<p><strong>Location:</strong>{@event.Location}</p><p><strong>Category:</strong> {@event.Category}</p>" +
+            //    $"<p><strong>Available Seats:</strong> {@event.MaxParticipants - @event.Participants.Count}</p>" +
+            //    $"</div>" +
+            //    $"</div>");
+            //    var sender = email.Build();
+            //@event.Participants = null;
+            await _unitOfWork.EventsService.UpdateEvent(@event);
+            //await sender.SendAsync();
+            return Ok(_unitOfWork.EventsService.GetEventById(@event.Id));
         }
     }
 }

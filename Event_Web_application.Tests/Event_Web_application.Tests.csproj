@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Events_Web_application\Events_Web_application.csproj" />
+    <ProjectReference Include="..\Events_Web_application\Events_Web_application.API.csproj" />
   </ItemGroup>
 
 </Project>

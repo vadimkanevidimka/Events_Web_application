@@ -1,19 +1,20 @@
 using Microsoft.EntityFrameworkCore;
-using Events_Web_application_DataBase;
 using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using React.AspNet;
 using Events_Web_application.Core.MidleWare;
-using Events_Web_application_DataBase.Repositories;
-using Events_Web_appliacation.Core.MidleWare.EmailNotificationService;
+using FluentValidation;
+using Events_Web_application.Domain.Models;
+using Events_Web_application.Application.MidleWare.Validation;
+using Events_Web_application.Infrastructure.DBContext;
+using Events_Web_application.Application.Services.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<EWADBContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Events_Web_application.API")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -42,10 +43,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     });
 builder.Services.AddControllersWithViews();
 
+
+///Add Validation
+builder.Services.AddScoped<IValidator<Event>, EventValidator>();
+builder.Services.AddScoped<IValidator<Participant>, ParticipantValidator>();
+builder.Services.AddScoped<IValidator<User>, UserValidator>();
+
 //Add React
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddReact();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

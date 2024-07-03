@@ -13,6 +13,7 @@ const CreateEvent = () => {
   const [maxParticipants, setMaxParticipants] = useState('');
   const [Base64URL, setbase64url] = useState('');
   const [eventimage, setImage] = useState([]);
+  const [nameofHost, setHost] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,6 +28,7 @@ const CreateEvent = () => {
       category,
       maxParticipants,
       eventimage,
+      nameofHost
     };
     // const formData = new FormData();
     // formData.append('title', title);
@@ -69,6 +71,10 @@ const CreateEvent = () => {
             <div class="mb-3">
               <label class="form-label">Description:</label>
               <textarea  class="form-control" value={description} onChange={(e) => setDescription(e.target.value)} />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Speaker:</label>
+              <input class="form-control" type="text" value={nameofHost} onChange={(e) => setHost(e.target.value)} required />
             </div>
             <div class="mb-3">
               <label class="form-label">Date and Time:</label>

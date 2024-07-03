@@ -1,23 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Events_Web_application_DataBase
+﻿namespace Events_Web_application.Domain.Models
 {
     public class User
     {
-        public int Id { get; set; }
-
-        [Required]
-        [MaxLength(100)]
+        public Guid Id { get; set; }
         public string Email { get; set; } = string.Empty;
-
-        [Required]
-        [MaxLength(100)]
         public string Password { get; set; } = string.Empty;
-        [Required]
         public int Role { get; set; }
-        [Required]
-        public int ParticipantId { get; set; }
-        [Required]
-        public Participant Participant { get; set; }
+        public Guid ParticipantId { get; set; }
+        public Participant? Participant { get; set; }
     }
 }

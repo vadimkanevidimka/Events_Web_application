@@ -1,5 +1,5 @@
-﻿using Events_Web_application_DataBase;
-using Events_Web_application_DataBase.Repositories;
+﻿using Events_Web_application.Application.Services.UnitOfWork;
+using Events_Web_application.Domain.Models;
 using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,19 +14,13 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpPost]
-        public IActionResult Registration([FromBody] User user)
+        public async Task<IActionResult> Registration([FromBody] User user)
         {
             user.Participant.RegistrationDate = DateTime.Now;
             user.Password = user.Password.CalculateHash();
             user.Role = user.Email.Contains("admin") ? 2 : 1;
-            _unitOfWork.Users.Add(user);
+            await _unitOfWork.UsersService.AddUser(user);
             return Ok();
-        }
-
-        [HttpGet]
-        public IActionResult GetAll()
-        {
-            return RedirectToAction("GetAll", "Users");
         }
     }
 }

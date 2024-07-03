@@ -65,10 +65,11 @@ const handleDelete = async () => {
               <div class="pin-details">
                   <h1 class="pin-title">{event.title}</h1>
                   <p class="pin-description"><strong>Description: </strong>{event.description}</p>
+                  <p><strong>Speaker:</strong> {event.nameOfHost}</p>
                   <p><strong>Date:</strong> {new Date(event.eventDateTime).toLocaleString()}</p>
                   <p><strong>Location:</strong> {event.location}</p>
                   <p><strong>Category:</strong> {event.category}</p>
-                  <p><strong>Available Seats:</strong> {event.maxParticipants - event.participants.length}</p>
+                  <p><strong>{event.maxParticipants - event.participants.length} </strong> seats available</p>
                   { event.maxParticipants - event.participants.length > 0 ? (
                       (Boolean(event.participants.find(x => x.id == localStorage.getItem("UserID") != null)) ? 
                       (<Button id='RegButton' className="btn btn-danger rounded-pill" onClick={handleUnRegister}>Unregister</Button> )

@@ -1,16 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace Events_Web_application_DataBase
+namespace Events_Web_application.Domain.Models
 {
     public class Image
     {
-        public int Id { get; set; }
-        [Required]
+        public Guid Id { get; set; }
         public string Base64URL { get; set; }
-        [Required]
-        public int EventId { get; set; }
-        [Required]
+        public Guid EventId { get; set; }
         [JsonIgnore]
         public Event Event { get; set; }
     }

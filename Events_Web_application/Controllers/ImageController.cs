@@ -1,5 +1,5 @@
-﻿using Events_Web_application_DataBase;
-using Events_Web_application_DataBase.Repositories;
+﻿using Events_Web_application.Application.Services.UnitOfWork;
+using Events_Web_application.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Events_Web_application.Controllers
@@ -13,37 +13,20 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpGet("{id}")]
-        public Image Get(int id) => _unitOfWork.Images.Get(id);
+        public async Task<Image> Get(Guid id) => await _unitOfWork.ImagesService.GetImageById(id);
 
         [HttpGet]
-        public List<Image> GetAll() => _unitOfWork.Images.GetAll().ToList();
+        public async Task<IEnumerable<Image>> GetAll() => await _unitOfWork.ImagesService.GetAllImages();
 
         [HttpPost]
-        public Image AddImage(int eventId, Image newimage)
-        {
-            try
-            {
-                var evnt = _unitOfWork.Events.Get(eventId);
-                evnt.EventImage = newimage;
-                _unitOfWork.Events.Update(evnt);
-                return _unitOfWork.Images.GetAll().Last();
-            }
-            catch
-            {
-                return _unitOfWork.Images.GetAll().Last();
-            }
-        }
+        public async Task<int> AddImage(Guid eventId, Image newimage) => await _unitOfWork.ImagesService.AddImage(eventId, newimage);
 
         [HttpDelete]
-        public int Delete(int id)
-        {
-            return _unitOfWork.Images.Delete(id);
-        }
+        public async Task<int> Delete(Guid id) =>
+            await _unitOfWork.ImagesService.DeleteImage(id);
 
         [HttpPatch]
-        public int Update(Image image)
-        {
-            return _unitOfWork.Images.Update(image);
-        }
+        public async Task<int> Update(Image image) => 
+            await _unitOfWork.ImagesService.UpdateImage(image);
     }
 }
