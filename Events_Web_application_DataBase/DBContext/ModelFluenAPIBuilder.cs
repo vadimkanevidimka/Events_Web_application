@@ -1,5 +1,6 @@
 ﻿using Events_Web_application.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Events_Web_application.Infrastructure.DBContext
 {
@@ -10,7 +11,6 @@ namespace Events_Web_application.Infrastructure.DBContext
             modelBuilder.Entity<Event>().Property(p => p.Title).HasMaxLength(200);
             modelBuilder.Entity<Event>().Property(p => p.Description).HasMaxLength(1000);
             modelBuilder.Entity<Event>().Property(p => p.Location).HasMaxLength(300);
-            modelBuilder.Entity<Event>().Property(p => p.Category).HasMaxLength(100);
 
             modelBuilder.Entity<Event>()
                 .HasMany(e => e.Participants)
@@ -19,8 +19,13 @@ namespace Events_Web_application.Infrastructure.DBContext
                     l => l.HasOne<Participant>().WithMany().HasForeignKey(e => e.ParticipantId),
                     r => r.HasOne<Event>().WithMany().HasForeignKey(e => e.EventId));
 
+            modelBuilder.Entity<Event>()
+                .HasOne(c => c.Category).WithMany(c => c.Events);
+
             modelBuilder.Entity<Event>().Navigation(e => e.Participants).AutoInclude();
             modelBuilder.Entity<Event>().Navigation(e => e.EventImage).AutoInclude();
+            modelBuilder.Entity<Event>().Navigation(e => e.Category).AutoInclude();
+            
 
             return this;
         }
@@ -39,6 +44,7 @@ namespace Events_Web_application.Infrastructure.DBContext
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+            modelBuilder.Entity<User>().HasOne(u => u.AsscesToken);
             return this;
         }
     }

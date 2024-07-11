@@ -1,6 +1,7 @@
 "use client";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container } from 'react-bootstrap';
 
@@ -9,16 +10,20 @@ const CreateEvent = () => {
   const [description, setDescription] = useState('');
   const [eventDateTime, setEventDateTime] = useState('');
   const [location, setLocation] = useState('');
-  const [category, setCategory] = useState('');
+  const [name, setCategory] = useState('');
   const [maxParticipants, setMaxParticipants] = useState('');
   const [Base64URL, setbase64url] = useState('');
   const [eventimage, setImage] = useState([]);
   const [nameofHost, setHost] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const eventimage = {
       Base64URL
+    };
+    const category = {
+      name
     };
     const event = {
       title,
@@ -42,6 +47,7 @@ const CreateEvent = () => {
     try {
       var response = await axios.post('http://localhost:5155/api/Event/Add', event)
       if(response.status == 200) alert('Event created successfully!');
+      navigate(-1);
     } catch (error) {
       console.error('There was an error creating the event!', error);
     }
@@ -86,7 +92,7 @@ const CreateEvent = () => {
             </div>
             <div class="mb-3">
               <label class="form-label">Category:</label>
-              <input class="form-control" type="text" value={category} onChange={(e) => setCategory(e.target.value)} required />
+              <input class="form-control" type="text" value={name} onChange={(e) => setCategory(e.target.value)} required />
             </div>
             <div class="mb-3">
               <label class="form-label">Max Participants:</label>

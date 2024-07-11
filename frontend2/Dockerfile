@@ -46,6 +46,10 @@ COPY /event_web_application_front/app ./app
 COPY /event_web_application_front/package.json ./package.json
 COPY /event_web_application_front/.next ./.next
 COPY /event_web_application_front/node_modules ./node_modules
+RUN npm install next
+RUN npm install axios
+RUN npm install bootstrap
 
 EXPOSE 3000
-RUN npm start /event_web_application_front/
+CMD ["npm","run","build"]
+CMD ["npm","run", "dev"]

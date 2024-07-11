@@ -1,8 +1,8 @@
 // src/components/EventDetail.js
 "use client";
-import EditEvent from './EventDetailsForAdmin';
-import EventDetail from './EventDetailsForUser';
-import '../EventView.css';
+import EditEvent from './eventdetailsforadmin.jsx';
+import EventDetail from './eventdetailsforuser.jsx';
+import '../eventview.css';
 
 const Event = () => {
   return (

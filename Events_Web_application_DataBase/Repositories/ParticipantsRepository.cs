@@ -2,6 +2,7 @@
 using Events_Web_application.Domain.Models;
 using Events_Web_application.Infrastructure.DBContext;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace Events_Web_application.Infrastructure.Repositories
 {
@@ -13,39 +14,75 @@ namespace Events_Web_application.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<int> Add(Participant newparticipant)
+        public async Task<int> Add(Participant newparticipant, CancellationTokenSource cancellationToken)
         {
-            _context.Participants.Add(newparticipant);
-            return await _context.SaveChangesAsync();
+            try
+            {
+                _context.Participants.Add(newparticipant);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex) 
+            {
+                await cancellationToken.CancelAsync();
+                return -1;
+            }
         }
 
-        public async Task<int> Delete(Guid id)
+        public async Task<int> Delete(Guid id, CancellationTokenSource cancellationToken)
         {
-            _context.Participants.Remove(await _context.Participants.Where(c => c.Id.Equals(id)).FirstAsync());
-            return await _context.SaveChangesAsync();
+            try
+            {
+                _context.Participants.Remove(await _context.Participants.Where(c => c.Id.Equals(id)).FirstAsync());
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                await cancellationToken.CancelAsync();
+                return -1;
+            }
+            
         }
 
-        public async Task<Participant> Get(Guid id)
+        public async Task<Participant> Get(Guid id, CancellationTokenSource cancellationToken)
         {
-            return await _context.Participants
-                .Where(c => c.Id.Equals(_context.Users.Where(c => c.Id == id).FirstOrDefault().Participant.Id))
-                .Include(c => c.UserEvents).FirstAsync();
+            try
+            {
+                return await _context.Participants
+                    .Where(c => c.Id.Equals(_context.Users.Where(c => c.Id == id).FirstOrDefault().Participant.Id))
+                    .Include(c => c.UserEvents).FirstAsync();
+            }
+            catch (Exception ex) 
+            {
+                await cancellationToken.CancelAsync();
+                return default(Participant);
+            }
         }
 
-        public async Task<IEnumerable<Participant>> GetAll()
+        public async Task<IEnumerable<Participant>> GetAll(CancellationTokenSource cancellationToken)
         {
-            return await _context.Participants.ToListAsync();
+            try
+            {
+                return await _context.Participants.ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                await cancellationToken.CancelAsync();
+                return Enumerable.Empty<Participant>();
+            }
         }
 
-        public async Task<IEnumerable<Participant>> GetBySearch(string searchtext)
+        public async Task<int> Update(Participant participant, CancellationTokenSource cancellationToken)
         {
-            return await _context.Participants.ToListAsync();
-        }
-
-        public async Task<int> Update(Participant participant)
-        {
-            _context.Participants.Update(participant);
-            return await _context.SaveChangesAsync();
+            try
+            {
+                _context.Participants.Update(participant);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex) 
+            {
+                await cancellationToken.CancelAsync();
+                return -1;
+            }
         }
     }
 }

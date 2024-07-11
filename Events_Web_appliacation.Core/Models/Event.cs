@@ -11,8 +11,8 @@
         public DateTime EventDateTime { get; set; }
 
         public string Location { get; set; } = string.Empty;
-        public bool IsOpened { get; set; }
-        public string Category { get; set; } = string.Empty;
+        public bool IsOpened { get; set; } = true;
+        public EventCategory Category { get; set; }
         public int MaxParticipants { get; set; }
         public string NameOfHost { get; set; }
         public List<Participant> Participants { get; set; } = new List<Participant>();

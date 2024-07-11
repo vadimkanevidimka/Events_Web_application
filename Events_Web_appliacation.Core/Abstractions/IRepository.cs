@@ -2,10 +2,10 @@
 {
     public interface IRepository<T> where T : class
     {
-        public Task<IEnumerable<T>> GetAll();
-        public Task<T> Get(Guid id);
-        public Task<int> Add(T item);
-        public  Task<int> Update(T item);
-        public Task<int> Delete(Guid id);
+        public Task<IEnumerable<T>> GetAll(CancellationTokenSource cancellationToken);
+        public Task<T> Get(Guid id, CancellationTokenSource cancellationToken);
+        public Task<int> Add(T item, CancellationTokenSource cancellationToken);
+        public  Task<int> Update(T item, CancellationTokenSource cancellationToken);
+        public Task<int> Delete(Guid id, CancellationTokenSource cancellationToken);
     }
 }

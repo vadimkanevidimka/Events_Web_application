@@ -19,7 +19,7 @@ namespace Events_Web_application.Controllers
             user.Participant.RegistrationDate = DateTime.Now;
             user.Password = user.Password.CalculateHash();
             user.Role = user.Email.Contains("admin") ? 2 : 1;
-            await _unitOfWork.UsersService.AddUser(user);
+            await _unitOfWork.UsersService.AddUser(user, new CancellationTokenSource());
             return Ok();
         }
     }

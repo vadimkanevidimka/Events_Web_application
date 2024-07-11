@@ -4,7 +4,7 @@ using Events_Web_application.Infrastructure.Repositories;
 
 namespace Events_Web_application.Application.Services.UnitOfWork
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork, IDisposable
     {
         /// <summary>
         /// Global Data Base Context
@@ -18,6 +18,11 @@ namespace Events_Web_application.Application.Services.UnitOfWork
         private ParticipantsService _participantsService;
         private UsersService _usersService;
         private ImagesService _imagesService;
+
+        /// <summary>
+        /// State
+        /// </summary>
+        private bool disposed = false;
         public UnitOfWork(EWADBContext context)
         {
             _context = context;
@@ -61,6 +66,24 @@ namespace Events_Web_application.Application.Services.UnitOfWork
                     _imagesService = new ImagesService(new ImageRepository(_context), new EventsRepository(_context));
                 return _imagesService;
             }
+        }
+
+        public virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    _context.Dispose();
+                }
+                this.disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

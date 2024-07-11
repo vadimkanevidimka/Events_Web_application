@@ -16,19 +16,27 @@ namespace Events_Web_application.Application.Services.DBServices
             _imageRepository = imageRepository;
             _eventRepository = eventsRepository;
         }
-        public async Task<int> AddImage(Guid eventId, Image image)
+        public async Task<int> AddImage(Guid eventId, Image image, CancellationTokenSource cancellationToken)
         {
-            var evnt = await _eventRepository.Get(eventId);
-            evnt.EventImage = image;
-            return await _eventRepository.Update(evnt);
+            try
+            {
+                var evnt = await _eventRepository.Get(eventId, cancellationToken);
+                evnt.EventImage = image;
+                return await _eventRepository.Update(evnt, cancellationToken);
+            }
+            catch (TaskCanceledException) 
+            {
+                cancellationToken.Token.ThrowIfCancellationRequested();
+                throw;
+            }
         }
-        public async Task<int> DeleteImage(Guid id) =>
-            await _imageRepository.Delete(id);
-        public async Task<int> UpdateImage(Image image) =>
-            await _imageRepository.Update(image);
-        public async Task<IEnumerable<Image>> GetAllImages() =>
-            await _imageRepository.GetAll();
-        public async Task<Image> GetImageById(Guid id) =>
-            await _imageRepository.Get(id);
+        public async Task<int> DeleteImage(Guid id, CancellationTokenSource cancellationToken) =>
+            await _imageRepository.Delete(id, cancellationToken);
+        public async Task<int> UpdateImage(Image image, CancellationTokenSource cancellationToken) =>
+            await _imageRepository.Update(image, cancellationToken);
+        public async Task<IEnumerable<Image>> GetAllImages(CancellationTokenSource cancellationToken) =>
+            await _imageRepository.GetAll(cancellationToken);
+        public async Task<Image> GetImageById(Guid id, CancellationTokenSource cancellationToken) =>
+            await _imageRepository.Get(id, cancellationToken);
     }
 }

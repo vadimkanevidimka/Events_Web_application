@@ -1,4 +1,5 @@
-﻿using Events_Web_application.Domain.Models;
+﻿using Events_Web_application.Application.Services.AuthServices;
+using Events_Web_application.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Events_Web_application.Infrastructure.DBContext
@@ -14,6 +15,8 @@ namespace Events_Web_application.Infrastructure.DBContext
         public DbSet<User> Users { get; set; }
         public DbSet<Participant> Participants { get; set; }
         public DbSet<UsersEvents> UsersEvents { get; set; }
+        public DbSet<EventCategory> VentCategories { get; set; }
+        public DbSet<AccesToken> AccesTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -17,15 +17,15 @@ namespace Events_Web_application.Application.Services.DBServices
         {
             _participantRepository = participantsRepository;
         }
-        public async Task<int> AddParticipant(Participant participant) =>
-            await _participantRepository.Add(participant);
-        public async Task<int> DeleteParticipant(Guid id) =>
-            await _participantRepository.Delete(id);
-        public async Task<int> UpdateParticipant(Participant participant) =>
-            await _participantRepository.Update(participant);
-        public async Task<IEnumerable<Participant>> GetAllParticipant() =>
-            await _participantRepository.GetAll();
-        public async Task<Participant> GetParticipantById(Guid id) =>
-            await _participantRepository.Get(id);
+        public async Task<int> AddParticipant(Participant participant, CancellationTokenSource cancellationToken) =>
+            await _participantRepository.Add(participant, cancellationToken);
+        public async Task<int> DeleteParticipant(Guid id, CancellationTokenSource cancellationToken) =>
+            await _participantRepository.Delete(id, cancellationToken);
+        public async Task<int> UpdateParticipant(Participant participant, CancellationTokenSource cancellationToken) =>
+            await _participantRepository.Update(participant, cancellationToken);
+        public async Task<IEnumerable<Participant>> GetAllParticipant(CancellationTokenSource cancellationToken) =>
+            await _participantRepository.GetAll(cancellationToken);
+        public async Task<Participant> GetParticipantById(Guid id, CancellationTokenSource cancellationToken) =>
+            await _participantRepository.Get(id, cancellationToken);
     }
 }

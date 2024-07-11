@@ -1,20 +1,23 @@
 using Microsoft.EntityFrameworkCore;
-using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Events_Web_application.Core.MidleWare;
 using FluentValidation;
 using Events_Web_application.Domain.Models;
+using Events_Web_application.Domain.Models.MappingModels.MappingProfiles;
 using Events_Web_application.Application.MidleWare.Validation;
 using Events_Web_application.Infrastructure.DBContext;
 using Events_Web_application.Application.Services.UnitOfWork;
+using System.Text;
+using Events_Web_application.Application.MidleWare.CancellationTokenMidleware;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<EWADBContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Events_Web_application.API")));
+                options.UseSqlite(builder.Configuration.GetConnectionString("MainDBConnection"), b => b.MigrationsAssembly("Events_Web_application.API")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -23,31 +26,31 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         options.RequireHttpsMetadata = false;
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
-                            // укзывает, будет ли валидироваться издатель при валидации токена
                             ValidateIssuer = true,
-                            // строка, представляющая издателя
-                            ValidIssuer = AuthOptions.ISSUER,
-
-                            // будет ли валидироваться потребитель токена
+                            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
                             ValidateAudience = true,
-                            // установка потребителя токена
-                            ValidAudience = AuthOptions.AUDIENCE,
-                            // будет ли валидироваться время существования
+                            ValidAudience = builder.Configuration["JWT:ValidAudience"],
                             ValidateLifetime = true,
-
-                            // установка ключа безопасности
-                            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                            // валидация ключа безопасности
+                            RequireExpirationTime = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
                             ValidateIssuerSigningKey = true,
                         };
                     });
+
+//builder.Services.AddIdentity<User, IdentityRole>().AddDefaultTokenProviders();
+
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddControllers(opt => opt.Filters.Add<TaskcanceledExceptionFilter>());
 
 ///Add Validation
 builder.Services.AddScoped<IValidator<Event>, EventValidator>();
 builder.Services.AddScoped<IValidator<Participant>, ParticipantValidator>();
 builder.Services.AddScoped<IValidator<User>, UserValidator>();
+
+///Add AutoMapper
+builder.Services.AddAutoMapper(typeof(EventMappingProfile));
+
 
 //Add React
 builder.Services.AddMemoryCache();
@@ -63,7 +66,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseExceptionHandlerMiddleware();
 
-//app.UseEmailServiceMidleware();
+//app.UseEmailServiceMidleware(new EmailServiceBuilder());
+
+///CancellationMidlware
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

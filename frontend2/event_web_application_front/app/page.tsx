@@ -3,21 +3,21 @@
 import React, { Children, Component } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, NavLink, Navigate, useHref } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Register from './components/Register';
-import Login from './components/Login';
-import EventList from './components/EventList';
-import EventDetail from './components/EventDetail';
-import UserEvents from './components/UserEvents';
-import AdminEventManagement from './components/adminEventManagment';
-import CreateEvent from './components/CreateEvent';
+import Register from './components/register.jsx';
+import Login from './components/login.jsx';
+import EventList from './components/eventlist.jsx';
+import EventDetail from './components/eventdetail.jsx';
+import UserEvents from './components/userevents.jsx';
+import AdminEventManagement from './components/admineventmanagment.jsx';
+import CreateEvent from './components/createevent.jsx';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import PrivateRoute from './components/PrivateRoute';
-import isAuthenticated from './components/IsAuthenticated';
-import AdminRoute from './components/AdminRoute';
-import isAdminAuthenticated from './components/AdminRoute'
+import PrivateRoute from './components/privateroute.jsx';
+import isAuthenticated from './components/isauthenticated.jsx';
+import AdminRoute from './components/adminroute.jsx';
+import isAdminAuthenticated from './components/adminroute.jsx'
 import { Button } from 'react-bootstrap';
 import { Content } from 'next/font/google';
 

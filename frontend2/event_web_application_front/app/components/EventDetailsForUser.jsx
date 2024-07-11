@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Button } from 'react-bootstrap';
-import EditEvent from './EventDetailsForAdmin';
-import '../EventView.css';
+import EditEvent from './eventdetailsforadmin.jsx';
+import '../eventview.css';
 
 const EventDetail = () => {
   const { id } = useParams();
@@ -68,22 +68,13 @@ const handleDelete = async () => {
                   <p><strong>Speaker:</strong> {event.nameOfHost}</p>
                   <p><strong>Date:</strong> {new Date(event.eventDateTime).toLocaleString()}</p>
                   <p><strong>Location:</strong> {event.location}</p>
-                  <p><strong>Category:</strong> {event.category}</p>
+                  <p><strong>Category:</strong> {event.category.name}</p>
                   <p><strong>{event.maxParticipants - event.participants.length} </strong> seats available</p>
-                  { event.maxParticipants - event.participants.length > 0 ? (
-                      (Boolean(event.participants.find(x => x.id == localStorage.getItem("UserID") != null)) ? 
+                  {Boolean(event.participants.find(x => x.id == localStorage.getItem("UserID") != null)) ? 
                       (<Button id='RegButton' className="btn btn-danger rounded-pill" onClick={handleUnRegister}>Unregister</Button> )
-                      : (<Button id='RegButton' className="btn btn-success rounded-pill" onClick={handleRegister}>Register</Button>)))
-                      : (
-                        <p>No seats available</p>
-                      )
+                      : (<Button id='RegButton' className="btn btn-success rounded-pill" onClick={handleRegister}>Register</Button>)
                   }
                   <button class="btn btn-outline-warning rounded-pill m-3" onClick={() => navigate(-1)}>Back</button>
-                  {
-                        localStorage.getItem("UserRole") == '2' ? 
-                        (<Button className="btn btn-danger rounded-pill" onClick={handleDelete}  to="/">Delete</Button>) : (<></>)
-                    }
-
               </div>
           </div>
           </div>

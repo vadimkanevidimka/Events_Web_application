@@ -49,14 +49,14 @@ const EventList = () => {
                         <div class="p-4 bg-transparent">
                             <h3 class="card-title">{event.title}</h3>
                             <p class="card-text text-truncate">Location: {event.location}</p>
-                            <p class="card-text text-truncate">Category: {event.category}</p>
+                            <p class="card-text text-truncate">Category: {event.category.name}</p>
                             <p className='text-muted'>Date: {new Date(event.eventDateTime).toLocaleDateString()}</p>
                             <div class="d-inline">
-                            {event.maxParticipants - event.participants.length > 0 ? (
+                            {Boolean(event.CountOfParticipants != event.maxParticipants) ? (
                                   <button to={`/events/${event.id}`} class="btn btn-success rounded-pill">View</button>
-                                  ) : (
-                                    <p>No seats available</p>
-                                  )}
+                                  ):(
+                                  <p>No seats available</p>
+                                )}
                             </div>
                         </div>
                     </div>

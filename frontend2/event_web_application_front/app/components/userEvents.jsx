@@ -50,7 +50,7 @@ const UserEvents = () => {
                         <div class="p-4 bg-transparent">
                             <h3 class="card-title">{event.title}</h3>
                             <p class="card-text text-truncate">Location: {event.location}</p>
-                            <p class="card-text text-truncate">Category: {event.category}</p>
+                            <p class="card-text text-truncate">Category: {event.category.name}</p>
                             <p className='text-muted'>Date: {new Date(event.eventDateTime).toLocaleDateString()}</p>
                             <div class="d-inline">
                               <button to={`/events/${event.id}`} class="btn btn-success rounded-pill">View</button>

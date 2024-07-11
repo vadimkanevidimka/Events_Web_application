@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
-import '../EventView.css';
+import '../eventview.css';
 
 const EditEvent = () => {
   const { id } = useParams();
@@ -125,7 +125,7 @@ const EditEvent = () => {
             <Form.Control
                 type="text"
                 name="category"
-                value={event.category}
+                value={event.category.name}
                 onChange={handleChange}
                 required
             />

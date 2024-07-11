@@ -13,29 +13,73 @@ namespace Events_Web_application.Infrastructure.Repositories
         {
             _context = context;
         }
-        public async Task<int> Delete(Guid id)
+        public async Task<int> Delete(Guid id, CancellationTokenSource cancellationToken)
         {
-            _context.Images.Remove(_context.Images.Where(c => c.Id == id).First());
-            return await _context.SaveChangesAsync();
+            try
+            {
+                _context.Images.Remove(_context.Images.Where(c => c.Id == id).First());
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex) 
+            {
+                await cancellationToken.CancelAsync();
+                return -1;
+            }
         }
 
-        public async Task<int> Add(Image newimage)
+        public async Task<int> Add(Image newimage, CancellationTokenSource cancellationToken)
         {
-            _context.Images.Add(newimage);
-            return await _context.SaveChangesAsync();
+            try
+            {
+                _context.Images.Add(newimage);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex) 
+            {
+                await cancellationToken.CancelAsync();
+                return -1;
+            }
         }
 
-        public async Task<Image> Get(Guid id) => 
-            await _context.Images.Where(c => c.Id == id).FirstAsync();
-
-
-        public async Task<IEnumerable<Image>> GetAll() => 
-            await _context.Images.ToListAsync();
-
-        public async Task<int> Update(Image newimage)
+        public async Task<Image> Get(Guid id, CancellationTokenSource cancellationToken)
         {
-            _context.Images.Update(newimage);
-            return await _context.SaveChangesAsync();
+            try
+            {
+                return await _context.Images.Where(c => c.Id == id).FirstAsync();
+            }
+            catch (Exception ex) 
+            {
+                await cancellationToken.CancelAsync();
+                return default(Image);
+            }
+        }
+
+
+        public async Task<IEnumerable<Image>> GetAll(CancellationTokenSource cancellationToken)
+        {
+            try
+            {
+                return await _context.Images.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                await cancellationToken.CancelAsync();
+                return Enumerable.Empty<Image>();
+            }
+        }
+
+        public async Task<int> Update(Image newimage, CancellationTokenSource cancellationToken)
+        {
+            try
+            {
+                _context.Images.Update(newimage);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex) 
+            {
+                await cancellationToken.CancelAsync();
+                return -1;
+            }
         }
     }
 }

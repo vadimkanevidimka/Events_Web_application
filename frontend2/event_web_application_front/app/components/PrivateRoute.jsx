@@ -3,7 +3,7 @@ import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import jwt_decode from 'jwt-decode';
 import { Navigate } from 'react-router-dom';
-import isAuthenticated from './IsAuthenticated';
+import isAuthenticated from './isauthenticated.jsx';
 
 
 const PrivateRoute = ({ children }) => {

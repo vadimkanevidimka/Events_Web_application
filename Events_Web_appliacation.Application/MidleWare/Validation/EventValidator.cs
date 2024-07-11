@@ -11,7 +11,7 @@ namespace Events_Web_application.Application.MidleWare.Validation
             RuleFor(x => x.Title).NotEmpty().Length(0, 200);
             RuleFor(x => x.Description).NotEmpty().Length(0, 1000);
             RuleFor(x => x.Location).NotEmpty().Length(0, 300);
-            RuleFor(x => x.Category).NotEmpty().Length(0, 100);
+            RuleFor(x => x.Category).NotNull();
         }
     }
 }
