@@ -20,8 +20,4 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Events_Web_appliacation.Core\Events_Web_application.Domain.csproj" />
-  </ItemGroup>
-
 </Project>
