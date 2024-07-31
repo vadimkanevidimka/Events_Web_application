@@ -1,6 +1,6 @@
 ﻿using Events_Web_appliacation.Domain.Abstractions;
-using Events_Web_application.Application.MidleWare.Exceptions;
-using Events_Web_application.Domain.Models;
+using Events_Web_application.Application.Services.Exceptions;
+using Events_Web_application.Domain.Entities;
 using Events_Web_application.Infrastructure.Repositories;
 
 namespace Events_Web_application.Application.Services.DBServices
@@ -72,7 +72,7 @@ namespace Events_Web_application.Application.Services.DBServices
             try
             {
                 if (id == Guid.Empty) throw new ArgumentNullException(nameof(id));
-                return await _usersRepository.Get(id, cancellationToken);
+                return await _usersRepository.Get(id, cancellationToken.Token);
             }
             catch (Exception ex)
             {

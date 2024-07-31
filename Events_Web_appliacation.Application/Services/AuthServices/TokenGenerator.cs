@@ -1,5 +1,5 @@
 ﻿using Events_Web_application.Application.Services.UnitOfWork;
-using Events_Web_application.Domain.Models;
+using Events_Web_application.Domain.Entities;
 using Events_Web_application_DataBase.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -49,7 +49,7 @@ namespace Events_Web_application.Application.Services.AuthServices
 
         private async Task<ClaimsIdentity> GetIdentity(string email, string password)
         {
-            User user = await _unitOfWork.UsersService.GetUserByEmail(email, new CancellationTokenSource());
+            User user = await _unitOfWork.Users.GetByEmail(email, new CancellationTokenSource().Token);
             if (user != null && user.Password == password.CalculateHash())
             {
                 var claims = new List<Claim>
@@ -68,7 +68,7 @@ namespace Events_Web_application.Application.Services.AuthServices
 
         private async Task<ClaimsIdentity> GetIdentity(Guid userId)
         {
-            User user = await _unitOfWork.UsersService.GetUsersById(userId, new CancellationTokenSource());
+            User user = await _unitOfWork.Users.Get(userId, new CancellationTokenSource().Token);
             if (user != null)
             {
                 var claims = new List<Claim>

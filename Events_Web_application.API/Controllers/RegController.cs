@@ -1,5 +1,5 @@
 ﻿using Events_Web_application.Application.Services.UnitOfWork;
-using Events_Web_application.Domain.Models;
+using Events_Web_application.Domain.Entities;
 using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +19,7 @@ namespace Events_Web_application.Controllers
             user.Participant.RegistrationDate = DateTime.Now;
             user.Password = user.Password.CalculateHash();
             user.Role = user.Email.Contains("admin") ? 2 : 1;
-            await _unitOfWork.UsersService.AddUser(user, new CancellationTokenSource());
+            await _unitOfWork.Users.Add(user, new CancellationTokenSource());
             return Ok();
         }
     }

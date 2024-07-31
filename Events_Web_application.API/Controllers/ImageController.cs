@@ -1,5 +1,5 @@
 ﻿using Events_Web_application.Application.Services.UnitOfWork;
-using Events_Web_application.Domain.Models;
+using Events_Web_application.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Events_Web_application.Controllers
@@ -15,20 +15,20 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<Image> Get(Guid id) => await _unitOfWork.ImagesService.GetImageById(id, _cancellationTokenSource);
+        public async Task<Image> Get(Guid id) => await _unitOfWork.Images.Get(id, _cancellationTokenSource.Token);
 
         [HttpGet]
-        public async Task<IEnumerable<Image>> GetAll() => await _unitOfWork.ImagesService.GetAllImages(_cancellationTokenSource);
+        public async Task<IEnumerable<Image>> GetAll() => await _unitOfWork.Images.GetAll(_cancellationTokenSource);
 
         [HttpPost]
-        public async Task<int> AddImage(Guid eventId, Image newimage) => await _unitOfWork.ImagesService.AddImage(eventId, newimage, _cancellationTokenSource);
+        public async Task<int> AddImage(Guid eventId, Image newimage) => await _unitOfWork.Images.AddImage(eventId, newimage, _cancellationTokenSource.Token);
 
         [HttpDelete]
         public async Task<int> Delete(Guid id) =>
-            await _unitOfWork.ImagesService.DeleteImage(id, _cancellationTokenSource);
+            await _unitOfWork.Images.Delete(id, _cancellationTokenSource);
 
         [HttpPatch]
         public async Task<int> Update(Image image) => 
-            await _unitOfWork.ImagesService.UpdateImage(image, _cancellationTokenSource);
+            await _unitOfWork.Images.Update(image, _cancellationTokenSource);
     }
 }

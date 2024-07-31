@@ -1,5 +1,5 @@
 ﻿using Events_Web_appliacation.Domain.Abstractions;
-using Events_Web_application.Domain.Models;
+using Events_Web_application.Domain.Entities;
 using Events_Web_application.Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
@@ -26,6 +26,6 @@ namespace Events_Web_application.Application.Services.DBServices
         public async Task<IEnumerable<Participant>> GetAllParticipant(CancellationTokenSource cancellationToken) =>
             await _participantRepository.GetAll(cancellationToken);
         public async Task<Participant> GetParticipantById(Guid id, CancellationTokenSource cancellationToken) =>
-            await _participantRepository.Get(id, cancellationToken);
+            await _participantRepository.Get(id, cancellationToken.Token);
     }
 }

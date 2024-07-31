@@ -1,6 +1,6 @@
 using Events_Web_application.Application.Services.UnitOfWork;
 using Events_Web_application.Controllers;
-using Events_Web_application.Domain.Models;
+using Events_Web_application.Domain.Entities;
 using Events_Web_application.Infrastructure.DBContext;
 using Microsoft.EntityFrameworkCore;
 

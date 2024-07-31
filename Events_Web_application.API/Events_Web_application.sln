@@ -20,6 +20,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events_Web_application.Infr
 		{18D388ED-0086-471A-8EE5-B86DD4B3E694} = {18D388ED-0086-471A-8EE5-B86DD4B3E694}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{51D9A94F-8CC4-4A03-98E7-78296FF04BD5}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

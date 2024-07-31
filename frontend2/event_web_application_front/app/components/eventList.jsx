@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Table, Container, Button, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import NotFound from './notfoundcomponent.jsx';
 import '../CardStyle.css'
 
 const EventList = () => {
@@ -41,28 +42,33 @@ const EventList = () => {
           </form>
           </div>
           <div class="container my-4">
-            <div class="card-columns">
-          {events.map(event => (
-                  <Link className='link text-decoration-none text-dark' to={`/events/${event.id}`}>
-                    <div class="pinterest-card mb-4">
-                        <img src={`${event.eventImage.base64URL}`} alt="Image"></img>
-                        <div class="p-4 bg-transparent">
-                            <h3 class="card-title">{event.title}</h3>
-                            <p class="card-text text-truncate">Location: {event.location}</p>
-                            <p class="card-text text-truncate">Category: {event.category.name}</p>
-                            <p className='text-muted'>Date: {new Date(event.eventDateTime).toLocaleDateString()}</p>
-                            <div class="d-inline">
-                            {Boolean(event.CountOfParticipants != event.maxParticipants) ? (
-                                  <button to={`/events/${event.id}`} class="btn btn-success rounded-pill">View</button>
-                                  ):(
-                                  <p>No seats available</p>
-                                )}
+            {events.length != 0 ? 
+            (<div class="card-columns">
+              {events.map(event => (
+                      <Link className='link text-decoration-none text-dark' to={`/events/${event.id}`}>
+                        <div class="pinterest-card mb-4 shadow">
+                            <img src={`${event.eventImage.base64URL}`} alt="Image"></img>
+                            <div class="p-4 bg-transparent">
+                                <h3 class="card-title">{event.title}</h3>
+                                <p class="card-text text-truncate">Location: {event.location}</p>
+                                <p class="card-text text-truncate">Category: {event.category.name}</p>
+                                <p className='text-muted'>Date: {new Date(event.eventDateTime).toLocaleDateString()}</p>
+                                <div class="d-inline">
+                                {Boolean(event.CountOfParticipants != event.maxParticipants) ? (
+                                      <button to={`/events/${event.id}`} class="btn btn-success rounded-pill">View</button>
+                                      ):(
+                                      <p>No seats available</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                  </Link>
-      ))}
-        </div>
+                      </Link>
+          ))}
+            </div>)
+            : 
+            (<NotFound></NotFound>)}
+
+            
       </div>
     </div>
     </Container>

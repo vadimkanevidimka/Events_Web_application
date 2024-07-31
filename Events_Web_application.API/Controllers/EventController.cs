@@ -1,86 +1,151 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Events_Web_application.Domain.Models;
 using Events_Web_application.Application.Services.UnitOfWork;
-using Events_Web_appliacation.Core.MidleWare.EmailNotificationService;
 using AutoMapper;
-using Events_Web_application.Domain.Models.MappingModels.MappingProfiles;
-using Events_Web_application.Domain.Models.MappingModels;
+using Events_Web_application.Domain.Entities;
+using Events_Web_application.API.MidleWare.MappingModels.MappingProfiles;
+using Events_Web_application.Application.Services.Exceptions;
+using FluentValidation;
+using Events_Web_application.Application.Services.DBServices.DBServicesGenerics;
+using Events_Web_application.API.MidleWare.MappingModels.DTOModels;
+using Events_Web_application.Application.Services.DBServices;
 
 namespace Events_Web_application.Controllers
 {
     public class EventController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IConfiguration _configuration;
-        private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly IMapper _mapper;
-        public EventController(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper)
+        private readonly EventsService _dbService;
+        private readonly CancellationTokenSource _cancellationTokenSource;
+        
+        public EventController(IUnitOfWork unitOfWork, IMapper mapper, IDBService<Event> service)
         {
             _unitOfWork = unitOfWork;
-            _configuration = configuration;
             _cancellationTokenSource = new CancellationTokenSource();
             _mapper = mapper;
+            _dbService = service as EventsService;
         }
 
         [HttpPost]
-        public async Task<int> Add([FromBody] Event @event)
+        public async Task<IActionResult> Add([FromBody] Event @event)
         {
-            return await _unitOfWork.EventsService.AddEvent(@event);
+            try
+            {
+                _unitOfWork.CreateTransaction();
+                if(await _dbService.IsRecordValid(@event, _cancellationTokenSource.Token))
+                {
+                    var transactionresult = await _unitOfWork.Events.Add(@event, _cancellationTokenSource);
+                    _unitOfWork.Commit();
+                    await _unitOfWork.Save();
+                    return Ok(transactionresult);
+                }
+                else return BadRequest();
+            }
+            catch(ServiceException ex)
+            {
+                _unitOfWork.Rollback();
+                return Problem(ex.Message, ex.Operation);
+            }
         }
 
         [HttpGet]
-        public async Task<IEnumerable<EventMappingProfile>> GetAll()
+        public async Task<IEnumerable<EventDTO>> GetAll()
         {
-            return _mapper.Map<IEnumerable<EventMappingProfile>>(await _unitOfWork.EventsService.GetAllEvents(_cancellationTokenSource));
+            try
+            {
+                return _mapper.Map<IEnumerable<Event>, IEnumerable<EventDTO>>(await _unitOfWork.Events.GetAll(_cancellationTokenSource));
+            }
+            catch(ServiceException ex) 
+            {
+                return null;
+            }
         }
 
         [HttpGet]
         public async Task<Event> GetById(Guid id)
         {
-            return await _unitOfWork.EventsService.GetEventById(id, _cancellationTokenSource);
+            try
+            {
+                return await _unitOfWork.Events.Get(id, _cancellationTokenSource.Token);
+            }
+            catch(ServiceException ex) 
+            {
+                return null;
+            }
         }
 
         [HttpGet]
-        public async Task<List<ListEventMap>> GetBySearch(string search = "", string category = "", string location = "") =>
-           _mapper.Map<List<Event>, List<ListEventMap>>(await _unitOfWork.EventsService.GetBySearch(search, category, location, _cancellationTokenSource) as List<Event>);
+        public async Task<List<EventDTO>> GetBySearch(string search = "", string category = "", string location = "") =>
+           _mapper.Map<List<Event>, List<EventDTO>>(await _unitOfWork.Events.GetBySearch(search, category, location, _cancellationTokenSource.Token) as List<Event>);
 
         [HttpPost]
         public async Task<int> AddParticipantToEvent(Guid eventid, Guid userid)
         {
-
-            return await _unitOfWork.EventsService.AddParticipantToEvent(eventid, userid, _cancellationTokenSource);
+            try
+            {
+                if(!await _dbService.IsUserRegisteredToEvent(userid, eventid))
+                {
+                    _unitOfWork.CreateTransaction();
+                    await _unitOfWork.Events.AddParticipantToEvent(eventid, userid, _cancellationTokenSource.Token);
+                    _unitOfWork.Commit();
+                    await _unitOfWork.Save();
+                    return 1;
+                }
+                return 0;
+            }
+            catch(ServiceException ex) 
+            {
+                _unitOfWork.Rollback();
+                return 0;
+            }
         }
 
         [HttpDelete]
         public async Task<int> Delete(Guid id)
         {
-            return await _unitOfWork.EventsService.Delete(id, _cancellationTokenSource);
+            return await _unitOfWork.Events.Delete(id, _cancellationTokenSource);
         }
 
         [HttpPost]
         public async Task<int> DeleteParticipantFromEvent(Guid eventid, Guid userid)
         {
-            return await _unitOfWork.EventsService.DeleteParticipantFromEvent(eventid, userid, _cancellationTokenSource);
+            try
+            {
+                _unitOfWork.CreateTransaction();
+                await _unitOfWork.Events.DeleteParticipantFromEvent(eventid, userid, _cancellationTokenSource.Token);
+                _unitOfWork.Commit();
+                await _unitOfWork.Save();
+                return 1;
+            }
+            catch (ServiceException ex)
+            {
+                _unitOfWork.Rollback();
+                return 0;
+            } 
         }
 
         [HttpGet]
         public async Task<IEnumerable<Event>> GetUsersEvents(Guid userid)
         {
-            return await _unitOfWork.EventsService.GetUserEvents(userid, _cancellationTokenSource);
+            return await _unitOfWork.Events.GetUsersEvents(userid, _cancellationTokenSource.Token);
         }
 
         [HttpPatch]
         public async Task<ActionResult<Event>> Update([FromBody] Event @event)
         {
-            await _unitOfWork.EventsService.UpdateEvent(@event, _cancellationTokenSource);
-            return Ok(_unitOfWork.EventsService.GetEventById(@event.Id, _cancellationTokenSource));
-        }
-
-        private async void SendToEmails(string[] emails, Event @event)
-        {
-            var email = new EmailServiceBuilder();
-            var sender = email.Build();
-            await sender.SendAsync();
+            try
+            {
+                if (await _dbService.IsRecordExist(@event, _cancellationTokenSource.Token) && await _dbService.IsRecordValid(@event, _cancellationTokenSource.Token))
+                {
+                    await _unitOfWork.Events.Update(@event, _cancellationTokenSource);
+                    return Ok(_unitOfWork.Events.Get(@event.Id, _cancellationTokenSource.Token));
+                }
+                else return BadRequest();
+            }
+            catch (ServiceException ex)
+            {
+                return Problem(ex.Message, ex.Operation);
+            }
         }
     }
 }

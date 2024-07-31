@@ -1,14 +1,14 @@
 ﻿using Events_Web_application.Application.Services.AuthServices;
-using Events_Web_application.Domain.Models;
+using Events_Web_application.Domain.Entities;
+using Events_Web_application.Infrastructure.DBContext.EntitiesConfigurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Events_Web_application.Infrastructure.DBContext
 {
     public class EWADBContext : DbContext
     {
-        ModelFluenAPI _fluentApiAnnotation;
         public EWADBContext(DbContextOptions<EWADBContext> settings) : base(settings)
-        { Database.EnsureCreated(); }
+        { }
 
         public DbSet<Event> Events { get; set; }
         public DbSet<Image> Images { get; set; }
@@ -25,10 +25,9 @@ namespace Events_Web_application.Infrastructure.DBContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            _fluentApiAnnotation = new ModelFluenAPI();
-            _fluentApiAnnotation.EntityModelAnnotation(modelBuilder)
-                .UserModelAnnotation(modelBuilder)
-                .ParticipantModelAnnotation(modelBuilder);
+            modelBuilder.ApplyConfiguration(new EventModelConfiguration());
+            modelBuilder.ApplyConfiguration(new ParticipantEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
         }
     }
 }

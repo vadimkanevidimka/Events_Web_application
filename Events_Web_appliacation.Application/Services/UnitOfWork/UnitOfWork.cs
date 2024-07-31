@@ -1,6 +1,8 @@
 ﻿using Events_Web_application.Application.Services.DBServices;
 using Events_Web_application.Infrastructure.DBContext;
 using Events_Web_application.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Events_Web_application.Application.Services.UnitOfWork
 {
@@ -10,14 +12,15 @@ namespace Events_Web_application.Application.Services.UnitOfWork
         /// Global Data Base Context
         /// </summary>
         private readonly EWADBContext _context;
+        private IDbContextTransaction? _objTran = null;
 
         /// <summary>
         /// Services for Repositories
         /// </summary>
-        private EventsService _eventsService;
-        private ParticipantsService _participantsService;
-        private UsersService _usersService;
-        private ImagesService _imagesService;
+        private EventsRepository _events;
+        private ParticipantsRepository _participants;
+        private UsersRepository _users;
+        private ImagesRepository _images;
 
         /// <summary>
         /// State
@@ -28,44 +31,54 @@ namespace Events_Web_application.Application.Services.UnitOfWork
             _context = context;
         }
 
-        public EventsService EventsService
+        public EventsRepository Events
         {
             get
             {
-                if (_eventsService == null)
-                    _eventsService = new EventsService(new EventsRepository(_context), new UsersRepository(_context));
-                return _eventsService;
+                if (_events == null)
+                    _events = new EventsRepository(_context);
+                return _events;
             }
         }
 
-        public ParticipantsService ParticipantsService
+        public ParticipantsRepository Participants
         {
             get
             {
-                if (_participantsService == null)
-                    _participantsService = new ParticipantsService(new ParticipantsRepository(_context));
-                return _participantsService;
+                if (_participants == null)
+                    _participants = new ParticipantsRepository(_context);
+                return _participants;
             }
         }
 
-        public UsersService UsersService
+        public UsersRepository Users
         {
             get
             {
-                if (_usersService == null)
-                    _usersService = new UsersService(new UsersRepository(_context));
-                return _usersService;
+                if (_users == null)
+                    _users = new UsersRepository(_context);
+                return _users;
             }
         }
 
-        public ImagesService ImagesService
+        public ImagesRepository Images
         {
             get
             {
-                if (_imagesService == null)
-                    _imagesService = new ImagesService(new ImageRepository(_context), new EventsRepository(_context));
-                return _imagesService;
+                if (_images == null)
+                    _images = new ImagesRepository(_context);
+                return _images;
             }
+        }
+
+        public void Commit()
+        {
+            _objTran?.Commit();
+        }
+
+        public void CreateTransaction()
+        {
+            _objTran = _context.Database.BeginTransaction();
         }
 
         public virtual void Dispose(bool disposing)
@@ -84,6 +97,24 @@ namespace Events_Web_application.Application.Services.UnitOfWork
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public void Rollback()
+        {
+            _objTran?.Rollback();
+            _objTran?.Dispose();
+        }
+
+        public async Task Save()
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
         }
     }
 }

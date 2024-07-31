@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Events_Web_application.Domain.Models;
 using Events_Web_application.Application.Services.UnitOfWork;
 using Events_Web_application.Application.Services.AuthServices;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using Events_Web_application.Domain.Entities;
 
 namespace TokenApp.Controllers
 {
@@ -31,9 +31,9 @@ namespace TokenApp.Controllers
             var TokenGenerationResult = await _tokenGenerator.GenerateAccessToken(default, loginUser.Email, loginUser.Password);
             AccesToken accesToken = TokenGenerationResult.Item1;
             ///
-            User user = await _unitOfWork.UsersService.GetUsersById(TokenGenerationResult.Item2, _cancellationTokenSource);
+            User user = await _unitOfWork.Users.Get(TokenGenerationResult.Item2, _cancellationTokenSource.Token);
             user.AsscesToken = accesToken;
-            await _unitOfWork.UsersService.UpdateUser(user, _cancellationTokenSource);
+            await _unitOfWork.Users.Update(user, _cancellationTokenSource);
             ///
             var response = new
             {
@@ -69,7 +69,7 @@ namespace TokenApp.Controllers
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
-            var user = await _unitOfWork.UsersService.GetUsersById(userId, _cancellationTokenSource);
+            var user = await _unitOfWork.Users.Get(userId, _cancellationTokenSource.Token);
 
             if (user == null || user.AsscesToken.RefreshToken != refreshToken || user.AsscesToken.ExpirationRTDateTime <= DateTime.Now)
             {
@@ -78,7 +78,7 @@ namespace TokenApp.Controllers
 
             var result = await _tokenGenerator.GenerateAccessToken();
             user.AsscesToken = result.Item1;
-            await _unitOfWork.UsersService.UpdateUser(user, _cancellationTokenSource);
+            await _unitOfWork.Users.Update(user, _cancellationTokenSource);
 
             var response = new
             {
@@ -114,12 +114,12 @@ namespace TokenApp.Controllers
         [HttpPost("{id}")]
         public async Task<IActionResult> Revoke(Guid userId)
         {
-            var user = await _unitOfWork.UsersService.GetUsersById(userId, _cancellationTokenSource);
+            var user = await _unitOfWork.Users.Get(userId, _cancellationTokenSource.Token);
             if (user == null) return BadRequest("Invalid user name");
 
             user.AsscesToken.RefreshToken = string.Empty;
             user.AsscesToken.ExpirationRTDateTime = default;
-            await _unitOfWork.UsersService.UpdateUser(user, _cancellationTokenSource);
+            await _unitOfWork.Users.Update(user, _cancellationTokenSource);
 
             return NoContent();
         }
@@ -128,12 +128,12 @@ namespace TokenApp.Controllers
         [HttpPost]
         public async Task<IActionResult> RevokeAll()
         {
-            var users =await _unitOfWork.UsersService.GetAllUsers(new CancellationTokenSource());
+            var users =await _unitOfWork.Users.GetAll(new CancellationTokenSource());
             foreach (var user in users)
             {
                 user.AsscesToken.RefreshToken = string.Empty;
                 user.AsscesToken.ExpirationRTDateTime = default;
-                await _unitOfWork.UsersService.UpdateUser(user, _cancellationTokenSource);
+                await _unitOfWork.Users.Update(user, _cancellationTokenSource);
             }
 
             return NoContent();

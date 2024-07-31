@@ -1,82 +1,51 @@
 ﻿using Events_Web_appliacation.Domain.Abstractions;
-using Events_Web_application.Domain.Models;
+using Events_Web_application.Domain.Entities;
 using Events_Web_application.Infrastructure.DBContext;
 using Microsoft.EntityFrameworkCore;
 
 namespace Events_Web_application.Infrastructure.Repositories
 {
-    public class EventsRepository : IRepository<Event>
+    public class EventsRepository(EWADBContext context) : GenericRepository<Event>(context), IEventRepository
     {
-        private readonly EWADBContext _context;
-        public EventsRepository(EWADBContext context) => 
-            _context = context;
-
-        public async Task<Event> Get(Guid id, CancellationTokenSource cancellationToken)
+        public async Task<int> AddParticipantToEvent(Guid eventid, Guid userid, CancellationToken cancellationToken)
         {
-            try
-            {
-                return await _context.Events.Where(c => c.Id == id).Include(c => c.Participants).Include(c => c.EventImage).FirstAsync();
-            }
-            catch (Exception ex) 
-            {
-                await cancellationToken.CancelAsync();
-                return default(Event);
-            }
+            var user = await _context.Users.FindAsync(userid);
+            var evnt = await _context.Events.FindAsync(eventid);
+            evnt.Participants.Add(user.Participant);
+            _context.Update(evnt);
+            return await _context.SaveChangesAsync();
         }
 
-        public async Task<int> Add(Event newevent, CancellationTokenSource cancellationToken)
+        public async Task<int> DeleteParticipantFromEvent(Guid eventid, Guid userid, CancellationToken cancellationToken)
         {
-            try
-            {
-                _context.Events.Add(newevent);
-                return await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                await cancellationToken.CancelAsync();
-                return -1;
-            }
-        }
-        public async Task<int> Delete(Guid id, CancellationTokenSource cancellationToken)
-        {
-            try
-            {
-                _context.Events.Remove(_context.Events.Where(c => c.Id == id).First());
-                return await _context.SaveChangesAsync();
-            }
-            catch (Exception ex) 
-            {
-                await cancellationToken.CancelAsync();
-                return -1;
-            }
+            var user = await _context.Users.FindAsync(userid);
+            var evnt = await _context.Events.FindAsync(eventid);
+            evnt.Participants.Remove(user.Participant);
+            _context.Update(evnt);
+            return await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Event>> GetAll(CancellationTokenSource cancellationToken)
+        public async Task<IEnumerable<Event>> GetBySearch(string search, string location, string category, CancellationToken cancellationToken)
         {
-            try
-            {
-                return await _context.Events.Include(c => c.Participants).Include(c => c.EventImage).ToListAsync();
-            }
-            catch (Exception ex) 
-            {
-                await cancellationToken.CancelAsync();
-                return Enumerable.Empty<Event>();
-            }
+            var query = _context.Events.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search)) 
+                query = query.Where(e => e.Title.Contains(search));
+
+            if (!string.IsNullOrEmpty(category))
+                query = query.Where(e => e.Category.Name.Contains(category));
+
+            if (!string.IsNullOrEmpty(location))
+                query = query.Where(e => e.Location.Contains(location));
+            return await query.ToListAsync();
         }
 
-        public async Task<int> Update(Event newevent, CancellationTokenSource cancellationToken)
+        public async Task<IEnumerable<Event>> GetUsersEvents(Guid userId, CancellationToken cancellationToken)
         {
-            try
-            {
-                _context.Events.Update(newevent);
-                return await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                await cancellationToken.CancelAsync();
-                return -1;
-            }
-           
+            var user = await _context.Users.FindAsync(userId, cancellationToken);
+            var evnts = await _context.Events.ToListAsync(cancellationToken);
+            var usrevents = evnts.Where(e => e.Participants.Contains(user.Participant));
+            return usrevents;
         }
     }
 }

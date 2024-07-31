@@ -1,5 +1,5 @@
 ﻿using Events_Web_application.Application.Services.UnitOfWork;
-using Events_Web_application.Domain.Models;
+using Events_Web_application.Domain.Entities;
 using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,22 +16,22 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpGet("{id}")]
-        public Task<User> Get(Guid id) => _unitOfWork.UsersService.GetUsersById(id, _cancellationTokenSource);
+        public Task<User> Get(Guid id) => _unitOfWork.Users.Get(id, _cancellationTokenSource.Token);
 
         [HttpGet]
-        public async Task<IEnumerable<User>> GetAll() => await _unitOfWork.UsersService.GetAllUsers(_cancellationTokenSource);
+        public async Task<IEnumerable<User>> GetAll() => await _unitOfWork.Users.GetAll(_cancellationTokenSource);
 
         [HttpPost]
         public async Task<Guid> AddUser(string email, string password)
         {
             try
             {
-                await _unitOfWork.UsersService.AddUser(new User 
+                await _unitOfWork.Users.Add(new User 
                 {
                     Email = email,
                     Password = password.CalculateHash(),
                 }, _cancellationTokenSource);
-                return _unitOfWork.UsersService.GetAllUsers(new CancellationTokenSource()).Result.Last().Id;
+                return _unitOfWork.Users.GetAll(new CancellationTokenSource()).Result.Last().Id;
             }
             catch
             {
@@ -42,13 +42,13 @@ namespace Events_Web_application.Controllers
         [HttpDelete]
         public async Task<int> Delete(Guid id) 
         {
-            return await _unitOfWork.UsersService.DeleteUser(id, _cancellationTokenSource);
+            return await _unitOfWork.Users.Delete(id, _cancellationTokenSource);
         }
 
         [HttpPatch]
         public async Task<int> Update(User user)
         {
-            return await _unitOfWork.UsersService.UpdateUser(user, _cancellationTokenSource);
+            return await _unitOfWork.Users.Update(user, _cancellationTokenSource);
         }
     }
 }

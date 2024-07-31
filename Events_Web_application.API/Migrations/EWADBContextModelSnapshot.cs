@@ -17,15 +17,38 @@ namespace Events_Web_application.API.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
 
-            modelBuilder.Entity("Events_Web_application.Domain.Models.Event", b =>
+            modelBuilder.Entity("Events_Web_application.Application.Services.AuthServices.AccesToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Category")
+                    b.Property<DateTime>("ExpirationJWTDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpirationRTDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RefreshToken")
                         .IsRequired()
-                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccesTokens");
+                });
+
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.Event", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CategoryId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
@@ -58,10 +81,31 @@ namespace Events_Web_application.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("Events_Web_application.Domain.Models.Image", b =>
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.EventCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VentCategories");
+                });
+
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.Image", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -82,7 +126,7 @@ namespace Events_Web_application.API.Migrations
                     b.ToTable("Images");
                 });
 
-            modelBuilder.Entity("Events_Web_application.Domain.Models.Participant", b =>
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.Participant", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -109,10 +153,13 @@ namespace Events_Web_application.API.Migrations
                     b.ToTable("Participants");
                 });
 
-            modelBuilder.Entity("Events_Web_application.Domain.Models.User", b =>
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("AsscesTokenId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -132,6 +179,8 @@ namespace Events_Web_application.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AsscesTokenId");
+
                     b.HasIndex("Email")
                         .IsUnique();
 
@@ -140,7 +189,7 @@ namespace Events_Web_application.API.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Events_Web_application.Domain.Models.UsersEvents", b =>
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.UsersEvents", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,47 +216,69 @@ namespace Events_Web_application.API.Migrations
                     b.ToTable("UsersEvents");
                 });
 
-            modelBuilder.Entity("Events_Web_application.Domain.Models.Image", b =>
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.Event", b =>
                 {
-                    b.HasOne("Events_Web_application.Domain.Models.Event", "Event")
+                    b.HasOne("Events_Web_application.Domain.Entities.EventCategory", "Category")
+                        .WithMany("Events")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.Image", b =>
+                {
+                    b.HasOne("Events_Web_application.Domain.Entities.Event", "Event")
                         .WithOne("EventImage")
-                        .HasForeignKey("Events_Web_application.Domain.Models.Image", "EventId")
+                        .HasForeignKey("Events_Web_application.Domain.Entities.Image", "EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("Events_Web_application.Domain.Models.User", b =>
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.User", b =>
                 {
-                    b.HasOne("Events_Web_application.Domain.Models.Participant", "Participant")
+                    b.HasOne("Events_Web_application.Application.Services.AuthServices.AccesToken", "AsscesToken")
+                        .WithMany()
+                        .HasForeignKey("AsscesTokenId");
+
+                    b.HasOne("Events_Web_application.Domain.Entities.Participant", "Participant")
                         .WithMany()
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("AsscesToken");
+
                     b.Navigation("Participant");
                 });
 
-            modelBuilder.Entity("Events_Web_application.Domain.Models.UsersEvents", b =>
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.UsersEvents", b =>
                 {
-                    b.HasOne("Events_Web_application.Domain.Models.Event", null)
+                    b.HasOne("Events_Web_application.Domain.Entities.Event", null)
                         .WithMany()
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Events_Web_application.Domain.Models.Participant", null)
+                    b.HasOne("Events_Web_application.Domain.Entities.Participant", null)
                         .WithMany()
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Events_Web_application.Domain.Models.Event", b =>
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.Event", b =>
                 {
                     b.Navigation("EventImage")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Events_Web_application.Domain.Entities.EventCategory", b =>
+                {
+                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,16 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Events_Web_application.Core.MidleWare;
-using FluentValidation;
-using Events_Web_application.Domain.Models;
-using Events_Web_application.Domain.Models.MappingModels.MappingProfiles;
-using Events_Web_application.Application.MidleWare.Validation;
 using Events_Web_application.Infrastructure.DBContext;
 using Events_Web_application.Application.Services.UnitOfWork;
 using System.Text;
-using Events_Web_application.Application.MidleWare.CancellationTokenMidleware;
-using Microsoft.AspNetCore.Identity;
+using FluentValidation.AspNetCore;
+using Events_Web_application.API.MidleWare.CancellationTokenMidleware;
+using Events_Web_application.API.MidleWare.MappingModels.MappingProfiles;
+using Events_Web_application.API.MidleWare;
+using System.Reflection;
+using Events_Web_application.Domain.Entities;
+using FluentValidation;
+using Events_Web_application.Application.Services.Validation;
+using Events_Web_application.Application.Services.DBServices.DBServicesGenerics;
+using Events_Web_application.Application.Services.DBServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,25 +40,34 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         };
                     });
 
-//builder.Services.AddIdentity<User, IdentityRole>().AddDefaultTokenProviders();
-
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddControllers(opt => opt.Filters.Add<TaskcanceledExceptionFilter>());
 
-///Add Validation
-builder.Services.AddScoped<IValidator<Event>, EventValidator>();
-builder.Services.AddScoped<IValidator<Participant>, ParticipantValidator>();
-builder.Services.AddScoped<IValidator<User>, UserValidator>();
 
 ///Add AutoMapper
 builder.Services.AddAutoMapper(typeof(EventMappingProfile));
+
+
+
+
+//AddFluentValidation
+builder.Services.AddMvc()
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
+
+///Add Validation
+
+builder.Services.AddScoped<IDBService<Event>, EventsService>();
+
 
 
 //Add React
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 var app = builder.Build();
+
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
