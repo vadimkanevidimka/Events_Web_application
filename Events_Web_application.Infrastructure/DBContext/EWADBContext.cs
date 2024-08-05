@@ -20,7 +20,7 @@ namespace Events_Web_application.Infrastructure.DBContext
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite();
+            //optionsBuilder.UseSqlite();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
