@@ -1,4 +1,5 @@
 ﻿using Events_Web_application.Application.Services.DBServices.DBServicesGenerics;
+using Events_Web_application.Application.Services.Validation;
 using Events_Web_application.Domain.Entities;
 using Events_Web_application.Infrastructure.DBContext;
 
@@ -8,7 +9,7 @@ namespace Events_Web_application.Application.Services.DBServices
     {
         public ImagesService(EWADBContext context) : base(context) 
         {
-            
+           
         }
     }
 }

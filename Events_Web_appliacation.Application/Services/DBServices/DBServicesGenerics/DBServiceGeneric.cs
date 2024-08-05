@@ -18,9 +18,8 @@ namespace Events_Web_application.Application.Services.DBServices.DBServicesGener
         {
             try
             {
-                if (record != null) throw new ArgumentNullException(nameof(record));
-                var objects = await _context.FindAsync(typeof(T), record, cancellationToken);
-                return objects == null ? false : true;
+                if (record == null) throw new ArgumentNullException(nameof(record));
+                return _context.Set<T>().Any(c => c.Equals(record));
             }
             catch (Exception ex) 
             {
@@ -46,12 +45,12 @@ namespace Events_Web_application.Application.Services.DBServices.DBServicesGener
         {
             try
             {
-                if (record != null) throw new ArgumentNullException(nameof(record));
-                var objects = await _context.FindAsync(typeof(T), record, cancellationToken);
-                return objects == null ? false : true;
+                if (record == null) throw new ArgumentNullException(nameof(record));
+                return _context.Set<T>().Any(c =>c.Equals(record));
             }
             catch (Exception ex) 
             {
+                return false;
                 throw new ServiceException(nameof(IsRecordDublicate), record);
             }
         }
