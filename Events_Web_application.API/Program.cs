@@ -59,7 +59,10 @@ builder.Services.AddMvc()
 
 builder.Services.AddScoped<IDBService<Event>, EventsService>();
 
-
+builder.Services.AddStackExchangeRedisCache(options => {
+    options.Configuration = "localhost:3002";
+    options.InstanceName = "agitated_bohr";
+});
 
 //Add React
 builder.Services.AddMemoryCache();
@@ -77,8 +80,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandlerMiddleware();
-
-//app.UseEmailServiceMidleware(new EmailServiceBuilder());
 
 ///CancellationMidlware
 

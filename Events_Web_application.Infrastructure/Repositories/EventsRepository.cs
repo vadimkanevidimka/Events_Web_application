@@ -2,13 +2,15 @@
 using Events_Web_application.Domain.Entities;
 using Events_Web_application.Domain.Models.Pagination;
 using Events_Web_application.Infrastructure.DBContext;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Events_Web_application.Infrastructure.Repositories
 {
-    public class EventsRepository(EWADBContext context) : GenericRepository<Event>(context), IEventRepository
+    public class EventsRepository : GenericRepository<Event>, IEventRepository
     {
+        public EventsRepository(EWADBContext context) : base(context) 
+        {}
         public async Task<int> AddParticipantToEvent(Guid eventid, Guid userid, CancellationToken cancellationToken)
         {
             var user = await _context.Users.FindAsync(userid);

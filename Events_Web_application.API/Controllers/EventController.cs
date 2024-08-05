@@ -10,6 +10,8 @@ using Events_Web_application.API.MidleWare.MappingModels.DTOModels;
 using Events_Web_application.Application.Services.DBServices;
 using Microsoft.AspNetCore.Authorization;
 using Events_Web_application.Domain.Models.Pagination;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Events_Web_application.Controllers
 {
@@ -55,7 +57,9 @@ namespace Events_Web_application.Controllers
         {
             try
             {
-                return _mapper.Map<IEnumerable<Event>, IEnumerable<EventDTO>>(await _unitOfWork.Events.GetAll(_cancellationTokenSource));
+                var events = await _unitOfWork.Events.GetAll(_cancellationTokenSource);
+                await _dbService.GetEventsImagesFromCache(events);
+                return _mapper.Map<IEnumerable<Event>, IEnumerable<EventDTO>>(events);
             }
             catch(ServiceException ex) 
             {
@@ -77,8 +81,13 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpGet]
-        public async Task<List<EventDTO>> GetBySearch(string search, string category, string location, [FromQuery] PaginationParameters paginationParameters) =>
-           _mapper.Map<List<Event>, List<EventDTO>>(await _unitOfWork.Events.GetBySearch(search, category, location, paginationParameters, _cancellationTokenSource.Token) as List<Event>);
+        public async Task<List<EventDTO>> GetBySearch(string search, string category, string location, [FromQuery] PaginationParameters paginationParameters)
+        {
+           var events = await _unitOfWork.Events.GetBySearch(search, category, location, paginationParameters, _cancellationTokenSource.Token);
+            await _dbService.GetEventsImagesFromCache(events);
+           return _mapper.Map<List<Event>, List<EventDTO>>(events.ToList());
+
+        }
 
         [HttpPost, Authorize]
         public async Task<int> AddParticipantToEvent(Guid eventid, Guid userid)
