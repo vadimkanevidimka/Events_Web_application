@@ -12,6 +12,9 @@ const EventList = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
+  const [pageNumber, setPagenumber] = useState('');
+  const [pageSize, setPageSize] = useState('');
+  const renderedItems = [];
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -21,6 +24,8 @@ const EventList = () => {
           search,
           category,
           location,
+          pageSize,
+          pageNumber
         },
       }
       );
@@ -28,7 +33,7 @@ const EventList = () => {
     };
 
     fetchEvents();
-  }, [search, category, location]);
+  }, [search, category, location, pageSize]);
 
   return (
     <Container className='my-4'>
@@ -39,6 +44,13 @@ const EventList = () => {
             <input className='form-control rounded-pill shadow m-2' type="text" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
             <input className='form-control rounded-pill shadow m-2' type="text" placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
             <input className='form-control rounded-pill shadow m-2' type="text" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
+            <select className='form-control rounded-pill shadow m-2' name="Page Size" value={pageSize} onChange={(e) => setPageSize(e.target.value)}>
+              <option value={'10'}>Page Size: 10</option>
+              <option value={'20'}>Page Size: 20</option>
+              <option value={'30'}>Page Size: 30</option>
+              <option value={'40'}>Page Size: 40</option>
+              <option value={'50'}>Page Size: 50</option>
+            </select>
           </form>
           </div>
           <div class="container my-4">
@@ -63,12 +75,18 @@ const EventList = () => {
                             </div>
                         </div>
                       </Link>
-          ))}
-            </div>)
+            ))}
+            </div>
+            )
             : 
             (<NotFound></NotFound>)}
-
-            
+            <div className='container py-4'>
+              <ul className='pagination justify-content-center text-dark rounded-pill m-2'>
+                <li class="page-item"><a class="page-link text-dark" onClick={() => pageNumber-1}>Previous</a></li>
+                <li class="page-item"><a class="page-link text-dark" href="#">1</a></li>
+                <li class="page-item"><a class="page-link text-dark" onClick={() => pageNumber+1}>Next</a></li>
+              </ul> 
+            </div>
       </div>
     </div>
     </Container>

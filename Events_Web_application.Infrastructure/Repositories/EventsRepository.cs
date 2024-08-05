@@ -1,6 +1,8 @@
 ﻿using Events_Web_appliacation.Domain.Abstractions;
 using Events_Web_application.Domain.Entities;
+using Events_Web_application.Domain.Models.Pagination;
 using Events_Web_application.Infrastructure.DBContext;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Events_Web_application.Infrastructure.Repositories
@@ -25,7 +27,7 @@ namespace Events_Web_application.Infrastructure.Repositories
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Event>> GetBySearch(string search, string location, string category, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Event>> GetBySearch(string search, string location, string category, PaginationParameters paginationParameters, CancellationToken cancellationToken)
         {
             var query = _context.Events.AsQueryable();
 
@@ -37,7 +39,11 @@ namespace Events_Web_application.Infrastructure.Repositories
 
             if (!string.IsNullOrEmpty(location))
                 query = query.Where(e => e.Location.Contains(location));
-            return await query.ToListAsync();
+
+
+            return await query.OrderBy(on => on.Title)
+                .Skip((paginationParameters.PageNumber - 1) * paginationParameters.PageSize)
+                .Take(paginationParameters.PageSize).ToListAsync(); ;
         }
 
         public async Task<IEnumerable<Event>> GetUsersEvents(Guid userId, CancellationToken cancellationToken)

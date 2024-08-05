@@ -8,6 +8,8 @@ using FluentValidation;
 using Events_Web_application.Application.Services.DBServices.DBServicesGenerics;
 using Events_Web_application.API.MidleWare.MappingModels.DTOModels;
 using Events_Web_application.Application.Services.DBServices;
+using Microsoft.AspNetCore.Authorization;
+using Events_Web_application.Domain.Models.Pagination;
 
 namespace Events_Web_application.Controllers
 {
@@ -75,10 +77,10 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpGet]
-        public async Task<List<EventDTO>> GetBySearch(string search = "", string category = "", string location = "") =>
-           _mapper.Map<List<Event>, List<EventDTO>>(await _unitOfWork.Events.GetBySearch(search, category, location, _cancellationTokenSource.Token) as List<Event>);
+        public async Task<List<EventDTO>> GetBySearch(string search, string category, string location, [FromQuery] PaginationParameters paginationParameters) =>
+           _mapper.Map<List<Event>, List<EventDTO>>(await _unitOfWork.Events.GetBySearch(search, category, location, paginationParameters, _cancellationTokenSource.Token) as List<Event>);
 
-        [HttpPost]
+        [HttpPost, Authorize]
         public async Task<int> AddParticipantToEvent(Guid eventid, Guid userid)
         {
             try
