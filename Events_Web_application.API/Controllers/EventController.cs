@@ -72,7 +72,9 @@ namespace Events_Web_application.Controllers
         {
             try
             {
-                return await _unitOfWork.Events.Get(id, _cancellationTokenSource.Token);
+                var @event = await _unitOfWork.Events.Get(id, _cancellationTokenSource.Token);
+                await _dbService.GetEventImageFromCache(@event);
+                return @event;
             }
             catch(ServiceException ex) 
             {
@@ -84,7 +86,7 @@ namespace Events_Web_application.Controllers
         public async Task<List<EventDTO>> GetBySearch(string search, string category, string location, [FromQuery] PaginationParameters paginationParameters)
         {
            var events = await _unitOfWork.Events.GetBySearch(search, category, location, paginationParameters, _cancellationTokenSource.Token);
-            await _dbService.GetEventsImagesFromCache(events);
+           await _dbService.GetEventsImagesFromCache(events);
            return _mapper.Map<List<Event>, List<EventDTO>>(events.ToList());
 
         }

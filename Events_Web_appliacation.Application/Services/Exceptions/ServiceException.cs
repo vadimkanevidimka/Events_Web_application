@@ -4,7 +4,7 @@
     {
         public string Operation { get; set; }
         public object Value { get; set; }
-        public ServiceException(string Operation, object Value) : base() 
+        public ServiceException(string Operation, object Value, string Message) : base(Message) 
         {
 
         }

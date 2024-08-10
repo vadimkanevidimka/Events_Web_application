@@ -23,7 +23,7 @@ namespace Events_Web_application.Application.Services.DBServices.DBServicesGener
             }
             catch (Exception ex) 
             {
-                throw new ServiceException(nameof(IsRecordExist), record);
+                throw new ServiceException(nameof(IsRecordExist), record, ex.Message);
             }
         }
 
@@ -37,7 +37,7 @@ namespace Events_Web_application.Application.Services.DBServices.DBServicesGener
             }
             catch (Exception ex) 
             {
-                throw new ServiceException(nameof(IsRecordValid), _validator.Validate(record).IsValid);
+                throw new ServiceException(nameof(IsRecordValid), _validator.Validate(record).IsValid, ex.Message);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Events_Web_application.Application.Services.DBServices.DBServicesGener
             catch (Exception ex) 
             {
                 return false;
-                throw new ServiceException(nameof(IsRecordDublicate), record);
+                throw new ServiceException(nameof(IsRecordDublicate), record, ex.Message);
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Events_Web_appliacation.Domain.Abstractions;
+using Events_Web_application.Domain.Entities;
 using Events_Web_application.Infrastructure.DBContext;
 using Microsoft.EntityFrameworkCore;
 

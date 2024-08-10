@@ -1,8 +1,10 @@
 ﻿using Events_Web_application.Application.Services.DBServices.DBServicesGenerics;
+using Events_Web_application.Application.Services.Exceptions;
 using Events_Web_application.Application.Services.Validation;
 using Events_Web_application.Domain.Entities;
 using Events_Web_application.Infrastructure.DBContext;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
 
@@ -19,14 +21,23 @@ namespace Events_Web_application.Application.Services.DBServices
 
         public async Task<IEnumerable<Event>> GetEventsImagesFromCache(IEnumerable<Event> events)
         {
-            foreach(Event @event in events){
-                var ImageString = await _cache.GetStringAsync(@event.Id.ToString());
-                    @event.EventImage = (ImageString == null) ? 
-                    _context.Images.Where(c => c.EventId == @event.Id).First() : 
-                    JsonSerializer.Deserialize<Image>(ImageString);
-            }
-            await AddImagesToCache(events);
+            foreach (Event @event in events)
+                await GetEventImageFromCache(@event);
             return events;
+        }
+
+        public async Task<Event> GetEventImageFromCache(Event @event)
+        {
+            var ImageString = await _cache.GetStringAsync(@event.Id.ToString());
+
+            @event.EventImage = (ImageString == null) ?
+            _context.Images.Where(c => c.EventId == @event.Id).First() : JsonSerializer.Deserialize<Image>(ImageString);
+
+            await Console.Out.WriteLineAsync($"For {@event.Title} image was upload from cache");
+
+            if(string.IsNullOrEmpty(ImageString)) await AddImageToCache(@event);
+
+            return @event;
         }
 
         /// <summary>
@@ -34,20 +45,28 @@ namespace Events_Web_application.Application.Services.DBServices
         /// </summary>
         /// <param name="events"></param>
         /// <returns>The number of images that was added to database.</returns>
-        public async Task<int> AddImagesToCache(IEnumerable<Event> events)
+        public async Task<int> AddImageToCache(Event @event)
         {
-            StringBuilder imagestring = new StringBuilder();
-            foreach (Event e in events) 
+            try
             {
-                imagestring.Append(JsonSerializer.Serialize(e.EventImage));
-                // сохраняем строковое представление объекта в формате json в кэш на 2 минуты
-                await _cache.SetStringAsync(e.Id.ToString(), imagestring.ToString(), new DistributedCacheEntryOptions
+                StringBuilder imagestring = new StringBuilder();
+                var cacheobj = _cache.Get(@event.Id.ToString());
+                if (cacheobj == null)
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
-                });
+                    imagestring.Append(JsonSerializer.Serialize(@event.EventImage));
+                    // сохраняем строковое представление объекта в формате json в кэш на 2 минуты
+                    await _cache.SetStringAsync(@event.Id.ToString(), imagestring.ToString(), new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
+                    });
+                }
                 imagestring.Clear();
+                return 1;
             }
-            return events.Count();
+            catch (Exception ex)
+            {
+                throw new ServiceException(nameof(AddImageToCache), @event, ex.Message);
+            }
         }
 
         public async Task<bool> IsUserRegisteredToEvent(Guid userId, Guid eventId)

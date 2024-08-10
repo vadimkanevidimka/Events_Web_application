@@ -12,7 +12,7 @@ const EventList = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
-  const [pageNumber, setPagenumber] = useState('');
+  const [pageNumber, setPagenumber] = useState(1);
   const [pageSize, setPageSize] = useState('');
   const renderedItems = [];
 
@@ -83,7 +83,6 @@ const EventList = () => {
             <div className='container py-4'>
               <ul className='pagination justify-content-center text-dark rounded-pill m-2'>
                 <li class="page-item"><a class="page-link text-dark" onClick={() => pageNumber-1}>Previous</a></li>
-                <li class="page-item"><a class="page-link text-dark" href="#">1</a></li>
                 <li class="page-item"><a class="page-link text-dark" onClick={() => pageNumber+1}>Next</a></li>
               </ul> 
             </div>
