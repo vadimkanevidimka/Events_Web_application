@@ -53,46 +53,69 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<EventDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
                 var events = await _unitOfWork.Events.GetAll(_cancellationTokenSource);
                 await _dbService.GetEventsImagesFromCache(events);
-                return _mapper.Map<IEnumerable<Event>, IEnumerable<EventDTO>>(events);
+                return Ok(_mapper.Map<IEnumerable<Event>, IEnumerable<EventDTO>>(events));
             }
-            catch(ServiceException ex) 
+            catch(ServiceException ex)
             {
-                return null;
+                return BadRequest(ex.Message);
+            }
+            catch(NullReferenceException ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
         [HttpGet]
-        public async Task<Event> GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id)
         {
             try
             {
                 var @event = await _unitOfWork.Events.Get(id, _cancellationTokenSource.Token);
                 await _dbService.GetEventImageFromCache(@event);
-                return @event;
+                return Ok(@event);
             }
             catch(ServiceException ex) 
             {
-                return null;
+                return BadRequest(ex.Message);
+            }
+            catch(ArgumentException argex)
+            {
+                return BadRequest("Value is invalid!");
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
 
         [HttpGet]
-        public async Task<List<EventDTO>> GetBySearch(string search, string category, string location, [FromQuery] PaginationParameters paginationParameters)
+        public async Task<IActionResult> GetBySearch(string search, string category, string location, [FromQuery] PaginationParameters paginationParameters)
         {
-           var events = await _unitOfWork.Events.GetBySearch(search, category, location, paginationParameters, _cancellationTokenSource.Token);
-           await _dbService.GetEventsImagesFromCache(events);
-           return _mapper.Map<List<Event>, List<EventDTO>>(events.ToList());
+            try
+            {
+               var events = await _unitOfWork.Events.GetBySearch(search, category, location, paginationParameters, _cancellationTokenSource.Token);
+               await _dbService.GetEventsImagesFromCache(events);
+               return Ok(_mapper.Map<List<Event>, List<EventDTO>>(events.ToList()));
+            }
+            catch(ServiceException ex) 
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(Exception ex) 
+            {
+                throw ex;
+            }
 
         }
 
-        [HttpPost, Authorize]
-        public async Task<int> AddParticipantToEvent(Guid eventid, Guid userid)
+        [HttpPost]
+        public async Task<IActionResult> AddParticipantToEvent(Guid eventid, Guid userid)
         {
             try
             {
@@ -102,14 +125,14 @@ namespace Events_Web_application.Controllers
                     await _unitOfWork.Events.AddParticipantToEvent(eventid, userid, _cancellationTokenSource.Token);
                     _unitOfWork.Commit();
                     await _unitOfWork.Save();
-                    return 1;
+                    return Ok("Participant added to event!");
                 }
-                return 0;
+                return BadRequest("Something is wrong...");
             }
             catch(ServiceException ex) 
             {
                 _unitOfWork.Rollback();
-                return 0;
+                return BadRequest($"Something is wrong...\n Maybe: {ex.Message}");
             }
         }
 
@@ -125,9 +148,11 @@ namespace Events_Web_application.Controllers
             try
             {
                 _unitOfWork.CreateTransaction();
-                await _unitOfWork.Events.DeleteParticipantFromEvent(eventid, userid, _cancellationTokenSource.Token);
-                _unitOfWork.Commit();
-                await _unitOfWork.Save();
+                if(1 == await _unitOfWork.Events.DeleteParticipantFromEvent(eventid, userid, _cancellationTokenSource.Token))
+                {
+                    _unitOfWork.Commit();
+                    await _unitOfWork.Save();
+                }
                 return 1;
             }
             catch (ServiceException ex)

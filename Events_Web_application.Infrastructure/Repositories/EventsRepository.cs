@@ -3,7 +3,6 @@ using Events_Web_application.Domain.Entities;
 using Events_Web_application.Domain.Models.Pagination;
 using Events_Web_application.Infrastructure.DBContext;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace Events_Web_application.Infrastructure.Repositories
 {
@@ -26,7 +25,7 @@ namespace Events_Web_application.Infrastructure.Repositories
             var evnt = await _context.Events.FindAsync(eventid);
             evnt.Participants.Remove(user.Participant);
             _context.Update(evnt);
-            return await _context.SaveChangesAsync();
+            return 1;
         }
 
         public async Task<IEnumerable<Event>> GetBySearch(string search, string location, string category, PaginationParameters paginationParameters, CancellationToken cancellationToken)
@@ -51,7 +50,7 @@ namespace Events_Web_application.Infrastructure.Repositories
         public async Task<IEnumerable<Event>> GetUsersEvents(Guid userId, CancellationToken cancellationToken)
         {
             var user = await _context.Users.FindAsync(userId, cancellationToken);
-            var evnts = await _context.Events.ToListAsync(cancellationToken);
+            var evnts = await _context.Events.Include(c => c.EventImage).ToListAsync(cancellationToken);
             var usrevents = evnts.Where(e => e.Participants.Contains(user.Participant));
             return usrevents;
         }
