@@ -28,21 +28,31 @@ namespace TokenApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Token([FromBody] User loginUser)
         {
-            var TokenGenerationResult = await _tokenGenerator.GenerateAccessToken(default, loginUser.Email, loginUser.Password);
-            AccesToken accesToken = TokenGenerationResult.Item1;
-            ///
-            User user = await _unitOfWork.Users.Get(TokenGenerationResult.Item2, _cancellationTokenSource.Token);
-            user.AsscesToken = accesToken;
-            await _unitOfWork.Users.Update(user, _cancellationTokenSource);
-            ///
-            var response = new
+            try
             {
-                access_token = user.AsscesToken,
-                id = user.Id,
-                userrole = user.Role,
-            };
+                var TokenGenerationResult = await _tokenGenerator.GenerateAccessToken(default, loginUser.Email, loginUser.Password);
+                AccesToken accesToken = TokenGenerationResult.Item1;
+                ///
+                User user = await _unitOfWork.Users.Get(TokenGenerationResult.Item2, _cancellationTokenSource.Token);
+                if(user == null){
+                    return Redirect("http://localhost:3000/register");
+                }
+                user.AsscesToken = accesToken;
+                await _unitOfWork.Users.Update(user, _cancellationTokenSource);
+                ///
+                var response = new
+                {
+                    access_token = user.AsscesToken,
+                    id = user.Id,
+                    userrole = user.Role,
+                };
 
-            return Ok(response);
+                return Ok(response);
+            }
+            catch (NullReferenceException nullex)
+            {
+                return Redirect("http://localhost:3000/register");
+            }
         }
 
         [HttpPost]

@@ -22,7 +22,6 @@ namespace Events_Web_application.Infrastructure.DBContext.EntitiesConfigurations
             builder.HasOne(c => c.Category).WithMany(c => c.Events);
 
             builder.Navigation(e => e.Participants).AutoInclude();
-            //builder.Navigation(e => e.EventImage).AutoInclude();
             builder.Navigation(e => e.Category).AutoInclude();
         }
     }

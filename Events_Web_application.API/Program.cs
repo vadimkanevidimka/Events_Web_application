@@ -10,8 +10,6 @@ using Events_Web_application.API.MidleWare.MappingModels.MappingProfiles;
 using Events_Web_application.API.MidleWare;
 using System.Reflection;
 using Events_Web_application.Domain.Entities;
-using FluentValidation;
-using Events_Web_application.Application.Services.Validation;
 using Events_Web_application.Application.Services.DBServices.DBServicesGenerics;
 using Events_Web_application.Application.Services.DBServices;
 

@@ -173,15 +173,19 @@ namespace Events_Web_application.Controllers
         {
             try
             {
+                _unitOfWork.CreateTransaction();
                 if (await _dbService.IsRecordExist(@event, _cancellationTokenSource.Token) && await _dbService.IsRecordValid(@event, _cancellationTokenSource.Token))
                 {
                     await _unitOfWork.Events.Update(@event, _cancellationTokenSource);
+                    _unitOfWork.Commit();
+                    await _unitOfWork.Save();
                     return Ok(_unitOfWork.Events.Get(@event.Id, _cancellationTokenSource.Token));
                 }
                 else return BadRequest();
             }
             catch (ServiceException ex)
             {
+                _unitOfWork.Rollback();
                 return Problem(ex.Message, ex.Operation);
             }
         }

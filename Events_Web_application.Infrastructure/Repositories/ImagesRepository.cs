@@ -15,7 +15,6 @@ namespace Events_Web_application.Infrastructure.Repositories
                 .FirstAsync(cancellationToken);
 
             evnt.EventImage = newimage;
-            _context.Events.Update(evnt);
             return await _context.SaveChangesAsync(cancellationToken);
         }
     }
