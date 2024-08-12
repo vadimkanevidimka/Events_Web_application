@@ -1,8 +1,7 @@
 ﻿namespace Events_Web_application.Domain.Entities
 {
-    public class UsersEvents
+    public class UsersEvents : BaseEntity
     {
-        public Guid Id { get; set; }
         public Guid ParticipantId { get; set; }
         public Guid EventId { get; set; }
         public bool ParticipantStatus { get; set; }

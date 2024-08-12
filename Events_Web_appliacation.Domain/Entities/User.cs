@@ -1,11 +1,9 @@
 ﻿using Events_Web_application.Application.Services.AuthServices;
-using Microsoft.AspNetCore.Identity;
 
 namespace Events_Web_application.Domain.Entities
 {
-    public class User
+    public class User : BaseEntity
     {
-        public Guid Id { get; set; }
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public AccesToken? AsscesToken { get; set; }

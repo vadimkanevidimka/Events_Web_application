@@ -2,10 +2,9 @@
 
 namespace Events_Web_application.Domain.Entities
 {
-    public class Participant
+    public class Participant : BaseEntity
     {
         public Participant() => UserEvents = new List<Event>();
-        public Guid Id { get; set; }
 
         public string FirstName { get; set; }
 

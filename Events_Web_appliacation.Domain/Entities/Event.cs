@@ -2,10 +2,8 @@
 
 namespace Events_Web_application.Domain.Entities
 {
-    public class Event
+    public class Event : BaseEntity
     {
-        public Guid Id { get; set; }
-
         public string Title { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;

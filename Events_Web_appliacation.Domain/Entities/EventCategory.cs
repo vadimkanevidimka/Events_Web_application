@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace Events_Web_application.Domain.Entities
 {
-    public class EventCategory
+    public class EventCategory : BaseEntity
     {
         public EventCategory() => Events = new List<Event>();
-        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         [JsonIgnore]

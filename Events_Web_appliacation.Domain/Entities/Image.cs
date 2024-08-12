@@ -2,9 +2,8 @@
 
 namespace Events_Web_application.Domain.Entities
 {
-    public class Image
+    public class Image : BaseEntity
     {
-        public Guid Id { get; set; }
         public string Base64URL { get; set; }
         public Guid EventId { get; set; }
 
