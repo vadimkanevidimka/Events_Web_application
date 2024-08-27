@@ -4,7 +4,7 @@ using Events_Web_application.Infrastructure.DBContext;
 using Events_Web_application.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace EventsWebApplication.Tests
+namespace Event_Web_application.Tests
 {
     public class RepositoryTests
     {

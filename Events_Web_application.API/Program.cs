@@ -1,17 +1,18 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Events_Web_application.Infrastructure.DBContext;
-using Events_Web_application.Application.Services.UnitOfWork;
 using System.Text;
+using System.Reflection;
 using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Events_Web_application.API.MidleWare;
+using Events_Web_application.Domain.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Events_Web_application.Infrastructure.DBContext;
+using Events_Web_application.Application.Services.DBServices;
+using Events_Web_application.Application.Services.UnitOfWork;
 using Events_Web_application.API.MidleWare.CancellationTokenMidleware;
 using Events_Web_application.API.MidleWare.MappingModels.MappingProfiles;
-using Events_Web_application.API.MidleWare;
-using System.Reflection;
-using Events_Web_application.Domain.Entities;
 using Events_Web_application.Application.Services.DBServices.DBServicesGenerics;
-using Events_Web_application.Application.Services.DBServices;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,13 +59,30 @@ builder.Services.AddMvc()
 builder.Services.AddScoped<IDBService<Event>, EventsService>();
 
 builder.Services.AddStackExchangeRedisCache(options => {
-    options.Configuration = "localhost:3002";
-    options.InstanceName = "agitated_bohr";
+    options.Configuration = "redis:3002";
+    options.InstanceName = "redis";
 });
 
-//Add React
-builder.Services.AddMemoryCache();
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+//Add Response Compression
+builder.Services.AddResponseCompression(options => 
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<GzipCompressionProvider>();
+    //options.Providers.Add<BrotliCompressionProvider>();
+
+});
+
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = System.IO.Compression.CompressionLevel.SmallestSize;
+});
+
+//builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+//{
+//    options.Level = System.IO.Compression.CompressionLevel.SmallestSize;
+//});
+
 var app = builder.Build();
 
 
@@ -78,6 +96,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandlerMiddleware();
+app.UseResponseCompression();
 
 ///CancellationMidlware
 

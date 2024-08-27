@@ -7,7 +7,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
-namespace EventsWebApplication.Tests
+namespace Event_Web_application.Tests
 {
     public class DBServiceGenericTests
     {

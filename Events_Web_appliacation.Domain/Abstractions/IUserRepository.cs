@@ -1,6 +1,6 @@
 ﻿using Events_Web_application.Domain.Entities;
 
-namespace Events_Web_appliacation.Domain.Abstractions
+namespace Events_Web_application.Domain.Abstractions
 {
     public interface IUserRepository : IRepository<User>
     {

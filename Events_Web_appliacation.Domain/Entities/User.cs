@@ -1,4 +1,4 @@
-﻿using Events_Web_application.Application.Services.AuthServices;
+﻿using Events_Web_application.Domain.Models.AuthModels;
 
 namespace Events_Web_application.Domain.Entities
 {

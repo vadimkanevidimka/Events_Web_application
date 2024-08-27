@@ -8,8 +8,9 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Events_Web_application.Domain.Entities;
+using Events_Web_application.Domain.Models.AuthModels;
 
-namespace TokenApp.Controllers
+namespace Events_Web_application.API.Controllers
 {
     public class AccountController : Controller
     {
@@ -34,7 +35,8 @@ namespace TokenApp.Controllers
                 AccesToken accesToken = TokenGenerationResult.Item1;
                 ///
                 User user = await _unitOfWork.Users.Get(TokenGenerationResult.Item2, _cancellationTokenSource.Token);
-                if(user == null){
+                if (user == null)
+                {
                     return Redirect("http://localhost:3000/register");
                 }
                 user.AsscesToken = accesToken;
@@ -138,7 +140,7 @@ namespace TokenApp.Controllers
         [HttpPost]
         public async Task<IActionResult> RevokeAll()
         {
-            var users =await _unitOfWork.Users.GetAll(new CancellationTokenSource());
+            var users = await _unitOfWork.Users.GetAll(new CancellationTokenSource());
             foreach (var user in users)
             {
                 user.AsscesToken.RefreshToken = string.Empty;

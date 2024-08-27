@@ -1,15 +1,14 @@
-
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
-EXPOSE 5155
 WORKDIR /app
+EXPOSE 5155
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY Events_Web_application.API.csproj ./
+COPY ["Events_Web_application.API.csproj", "."]
 RUN dotnet restore "./././Events_Web_application.API.csproj"
-COPY . .
+COPY ./ ./
 WORKDIR "/src/."
 RUN dotnet build "./Events_Web_application.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

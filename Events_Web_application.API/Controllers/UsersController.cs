@@ -1,9 +1,9 @@
-﻿using Events_Web_application.Application.Services.UnitOfWork;
+﻿using Events_Web_application.Application.Services;
+using Events_Web_application.Application.Services.UnitOfWork;
 using Events_Web_application.Domain.Entities;
-using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Events_Web_application.Controllers
+namespace Events_Web_application.API.Controllers
 {
     public class UsersController : Controller
     {
@@ -26,7 +26,7 @@ namespace Events_Web_application.Controllers
         {
             try
             {
-                await _unitOfWork.Users.Add(new User 
+                await _unitOfWork.Users.Add(new User
                 {
                     Email = email,
                     Password = password.CalculateHash(),
@@ -40,7 +40,7 @@ namespace Events_Web_application.Controllers
         }
 
         [HttpDelete]
-        public async Task<int> Delete(Guid id) 
+        public async Task<int> Delete(Guid id)
         {
             return await _unitOfWork.Users.Delete(id, _cancellationTokenSource);
         }
