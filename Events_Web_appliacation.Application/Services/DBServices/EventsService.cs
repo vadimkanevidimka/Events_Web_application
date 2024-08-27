@@ -4,7 +4,6 @@ using Events_Web_application.Application.Services.Validation;
 using Events_Web_application.Domain.Entities;
 using Events_Web_application.Infrastructure.DBContext;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
 
@@ -31,7 +30,8 @@ namespace Events_Web_application.Application.Services.DBServices
             var ImageString = await _cache.GetStringAsync(@event.Id.ToString());
 
             @event.EventImage = (ImageString == null) ?
-            _context.Images.Where(c => c.EventId == @event.Id).First() : JsonSerializer.Deserialize<Image>(ImageString);
+            _context?.Images?.Where(c => c.EventId == @event.Id).First() 
+            : JsonSerializer.Deserialize<Image>(ImageString);
 
             await Console.Out.WriteLineAsync($"For {@event.Title} image was upload from cache");
 
@@ -54,7 +54,6 @@ namespace Events_Web_application.Application.Services.DBServices
                 if (cacheobj == null)
                 {
                     imagestring.Append(JsonSerializer.Serialize(@event.EventImage));
-                    // сохраняем строковое представление объекта в формате json в кэш на 2 минуты
                     await _cache.SetStringAsync(@event.Id.ToString(), imagestring.ToString(), new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)

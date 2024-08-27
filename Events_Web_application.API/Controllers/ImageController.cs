@@ -2,7 +2,7 @@
 using Events_Web_application.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Events_Web_application.Controllers
+namespace Events_Web_application.API.Controllers
 {
     public class ImageController : Controller
     {
@@ -28,7 +28,7 @@ namespace Events_Web_application.Controllers
             await _unitOfWork.Images.Delete(id, _cancellationTokenSource);
 
         [HttpPatch]
-        public async Task<int> Update(Image image) => 
+        public async Task<int> Update(Image image) =>
             await _unitOfWork.Images.Update(image, _cancellationTokenSource);
     }
 }

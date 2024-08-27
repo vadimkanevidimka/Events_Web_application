@@ -1,5 +1,5 @@
-﻿using Events_Web_application.Application.Services.AuthServices;
-using Events_Web_application.Domain.Entities;
+﻿using Events_Web_application.Domain.Entities;
+using Events_Web_application.Domain.Models.AuthModels;
 using Events_Web_application.Infrastructure.DBContext.EntitiesConfigurations;
 using Microsoft.EntityFrameworkCore;
 

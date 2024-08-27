@@ -1,6 +1,6 @@
 ﻿using Events_Web_application.Domain.Entities;
 
-namespace Events_Web_appliacation.Domain.Abstractions
+namespace Events_Web_application.Domain.Abstractions
 {
     public interface IRepository<T> where T : class
     {
@@ -8,7 +8,7 @@ namespace Events_Web_appliacation.Domain.Abstractions
         public Task<T> Get(Guid id, CancellationToken cancellationToken);
         public Task<int> Add(T item, CancellationTokenSource cancellationToken);
         public Task<int> Add(List<T> newitems, CancellationTokenSource cancellationToken);
-        public  Task<int> Update(T item, CancellationTokenSource cancellationToken);
+        public Task<int> Update(T item, CancellationTokenSource cancellationToken);
         public Task<int> Delete(Guid id, CancellationTokenSource cancellationToken);
         public Task<int> Delete(T item, CancellationTokenSource cancellationToken);
 

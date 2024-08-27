@@ -13,7 +13,7 @@ using Events_Web_application.Domain.Models.Pagination;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 
-namespace Events_Web_application.Controllers
+namespace Events_Web_application.API.Controllers
 {
     public class EventController : Controller
     {
@@ -21,7 +21,7 @@ namespace Events_Web_application.Controllers
         private readonly IMapper _mapper;
         private readonly EventsService _dbService;
         private readonly CancellationTokenSource _cancellationTokenSource;
-        
+
         public EventController(IUnitOfWork unitOfWork, IMapper mapper, IDBService<Event> service)
         {
             _unitOfWork = unitOfWork;
@@ -36,7 +36,7 @@ namespace Events_Web_application.Controllers
             try
             {
                 _unitOfWork.CreateTransaction();
-                if(await _dbService.IsRecordValid(@event, _cancellationTokenSource.Token))
+                if (await _dbService.IsRecordValid(@event, _cancellationTokenSource.Token))
                 {
                     var transactionresult = await _unitOfWork.Events.Add(@event, _cancellationTokenSource);
                     _unitOfWork.Commit();
@@ -45,7 +45,7 @@ namespace Events_Web_application.Controllers
                 }
                 else return BadRequest();
             }
-            catch(ServiceException ex)
+            catch (ServiceException ex)
             {
                 _unitOfWork.Rollback();
                 return Problem(ex.Message, ex.Operation);
@@ -61,11 +61,11 @@ namespace Events_Web_application.Controllers
                 await _dbService.GetEventsImagesFromCache(events);
                 return Ok(_mapper.Map<IEnumerable<Event>, IEnumerable<EventDTO>>(events));
             }
-            catch(ServiceException ex)
+            catch (ServiceException ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch(NullReferenceException ex)
+            catch (NullReferenceException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -80,17 +80,17 @@ namespace Events_Web_application.Controllers
                 await _dbService.GetEventImageFromCache(@event);
                 return Ok(@event);
             }
-            catch(ServiceException ex) 
+            catch (ServiceException ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch(ArgumentException argex)
+            catch (ArgumentException argex)
             {
                 return BadRequest("Value is invalid!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw ex;
+                return NotFound(id);
             }
         }
 
@@ -99,15 +99,15 @@ namespace Events_Web_application.Controllers
         {
             try
             {
-               var events = await _unitOfWork.Events.GetBySearch(search, category, location, paginationParameters, _cancellationTokenSource.Token);
-               await _dbService.GetEventsImagesFromCache(events);
-               return Ok(_mapper.Map<List<Event>, List<EventDTO>>(events.ToList()));
+                var events = await _unitOfWork.Events.GetBySearch(search, category, location, paginationParameters, _cancellationTokenSource.Token);
+                await _dbService.GetEventsImagesFromCache(events);
+                return Ok(_mapper.Map<List<Event>, List<EventDTO>>(events.ToList()));
             }
-            catch(ServiceException ex) 
+            catch (ServiceException ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -119,7 +119,7 @@ namespace Events_Web_application.Controllers
         {
             try
             {
-                if(!await _dbService.IsUserRegisteredToEvent(userid, eventid))
+                if (!await _dbService.IsUserRegisteredToEvent(userid, eventid))
                 {
                     _unitOfWork.CreateTransaction();
                     await _unitOfWork.Events.AddParticipantToEvent(eventid, userid, _cancellationTokenSource.Token);
@@ -129,7 +129,7 @@ namespace Events_Web_application.Controllers
                 }
                 return BadRequest("Something is wrong...");
             }
-            catch(ServiceException ex) 
+            catch (ServiceException ex)
             {
                 _unitOfWork.Rollback();
                 return BadRequest($"Something is wrong...\n Maybe: {ex.Message}");
@@ -148,7 +148,7 @@ namespace Events_Web_application.Controllers
             try
             {
                 _unitOfWork.CreateTransaction();
-                if(1 == await _unitOfWork.Events.DeleteParticipantFromEvent(eventid, userid, _cancellationTokenSource.Token))
+                if (1 == await _unitOfWork.Events.DeleteParticipantFromEvent(eventid, userid, _cancellationTokenSource.Token))
                 {
                     _unitOfWork.Commit();
                     await _unitOfWork.Save();
@@ -159,7 +159,7 @@ namespace Events_Web_application.Controllers
             {
                 _unitOfWork.Rollback();
                 return 0;
-            } 
+            }
         }
 
         [HttpGet]

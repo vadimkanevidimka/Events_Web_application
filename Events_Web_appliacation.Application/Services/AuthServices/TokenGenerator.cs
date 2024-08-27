@@ -1,6 +1,6 @@
 ﻿using Events_Web_application.Application.Services.UnitOfWork;
 using Events_Web_application.Domain.Entities;
-using Events_Web_application_DataBase.Services;
+using Events_Web_application.Domain.Models.AuthModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

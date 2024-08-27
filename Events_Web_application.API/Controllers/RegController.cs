@@ -1,14 +1,14 @@
-﻿using Events_Web_application.Application.Services.UnitOfWork;
+﻿using Events_Web_application.Application.Services;
+using Events_Web_application.Application.Services.UnitOfWork;
 using Events_Web_application.Domain.Entities;
-using Events_Web_application_DataBase.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Events_Web_application.Controllers
+namespace Events_Web_application.API.Controllers
 {
     public class RegController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public RegController(IUnitOfWork unitOfWork) 
+        public RegController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
